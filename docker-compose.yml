@@ -1,104 +1,237 @@
-version: '3.1'
-
-volumes:
-    prometheus_data: {}
-    grafana_data: {}
-
-networks:
-  front-tier:
-  back-tier:
+version: '3.4'
 
 services:
 
   prometheus:
-    image: prom/prometheus:v2.1.0
+    image: prom/prometheus
+    container_name: prometheus
     volumes:
       - ./prometheus/:/etc/prometheus/
-      - prometheus_data:/prometheus
+      - ${DATA_DIR}/prometheus:/prometheus:rw
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
-    ports:
-      - 9090:9090
-    links:
-      - cadvisor:cadvisor
-      - alertmanager:alertmanager
     depends_on:
-      - cadvisor
-    networks:
-      - back-tier
+      - prometheus-cadvisor
     restart: always
-#    deploy:
-#      placement:
-#        constraints:
-#          - node.hostname == ${HOSTNAME}
+    deploy:
+      placement:
+        constraints:
+          - node.role==manager
+    env_file:
+      - ./prometheus.env
+    networks:
+      operations_intranet:
+        ipv4_address: 172.30.23.2
+        aliases:
+          - prometheus
 
-  node-exporter:
+  prometheus-node-exporter:
     image: prom/node-exporter
+    container_name: prometheus-node-exporter
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /:/rootfs:ro
+    dns: ${DNS_IP}
+    external_links:
+      - dns
     command: 
       - '--path.procfs=/host/proc' 
       - '--path.sysfs=/host/sys'
       - --collector.filesystem.ignored-mount-points
       - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
-    ports:
-      - 9100:9100
-    networks:
-      - back-tier
     restart: always
     deploy:
       mode: global
-
-  alertmanager:
-    image: prom/alertmanager
-    ports:
-      - 9093:9093
-    volumes:
-      - ./alertmanager/:/etc/alertmanager/
+    env_file:
+      - ./prometheus.env
     networks:
-      - back-tier
+      operations_intranet:
+        ipv4_address: 172.30.23.3
+        aliases:
+          - prometheus-node-exporter
+
+  prometheus-alertmanager:
+    image: prom/alertmanager
+    container_name: prometheus-alertmanager
+    dns: ${DNS_IP}
+    external_links:
+      - dns
+    volumes:
+      - "./alertmanager/:/etc/alertmanager/"
+    networks:
+      - monitor-net
     restart: always
     command:
       - '--config.file=/etc/alertmanager/config.yml'
       - '--storage.path=/alertmanager'
-#    deploy:
-#      placement:
-#        constraints:
-#          - node.hostname == ${HOSTNAME}
-  cadvisor:
+    deploy:
+      placement:
+        constraints:
+           - node.role==manager
+    env_file:
+      - ./prometheus.env
+    networks:
+      operations_intranet:
+        ipv4_address: 172.30.23.4
+        aliases:
+          - prometheus-alertmanager
+
+  prometheus-cadvisor:
     image: google/cadvisor
+    container_name: prometheus-cadvisor
+    dns: ${DNS_IP}
+    external_links:
+      - dns
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:rw
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
-    ports:
-      - 8080:8080
-    networks:
-      - back-tier
     restart: always
     deploy:
       mode: global
+    env_file:
+      - ./prometheus.env
+    networks:
+      operations_intranet:
+        ipv4_address: 172.30.23.5
+        aliases:
+          - prometheus-cadvisor
 
   grafana:
     image: grafana/grafana
-    user: "104"
+    container_name: grafana
+    dns: ${DNS_IP}
+    external_links:
+      - dns
     depends_on:
       - prometheus
-    ports:
-      - 3000:3000
     volumes:
-      - grafana_data:/var/lib/grafana
+      - ${DATA_DIR}/grafana:/var/lib/grafana:rw
       - ./grafana/provisioning/:/etc/grafana/provisioning/
+      - ./grafana/grafana.ini:/etc/grafana/grafana.ini
+      - ./grafana/ldap.toml:/etc/grafana/ldap.toml
     env_file:
       - ./grafana/config.monitoring
-    networks:
-      - back-tier
-      - front-tier
     restart: always
+    env_file:
+      - ./prometheus.env
+    networks:
+      operations_intranet:
+        ipv4_address: 172.30.23.6
+        aliases:
+          - grafana
+
+  proxy-grafana:
+    build: ./proxy-grafana
+    image: registry.liquibrium.com/proxy-grafana
+    container_name: grafana-proxy
+    dns: ${DNS_IP}
+    external_links:
+      - container-registry
+      - dns
+    depends_on:
+      - grafana
+    environment:
+      VIRTUAL_HOST: monitor.liquibrium.local
+      NETWORK_ACCESS: internal
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+    networks:
+      operations_intranet:
+        ipv4_address: 172.30.23.7
+
+  proxy-prometheus:
+    build: ./proxy-prometheus
+    image: registry.liquibrium.com/proxy-prometheus
+    container_name: prometheus-proxy
+    dns: ${DNS_IP}
+    external_links:
+      - container-registry
+      - dns
+    depends_on:
+      - prometheus
+    environment:
+      VIRTUAL_HOST: prometheus.liquibrium.local
+      NETWORK_ACCESS: internal
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+    networks:
+      operations_intranet:
+        ipv4_address: 172.30.23.8
+
+  proxy-node-stats:
+    build: ./proxy-node-stats
+    image: registry.liquibrium.com/proxy-node-stats
+    container_name: prometheus-node-stats
+    dns: ${DNS_IP}
+    external_links:
+      - container-registry
+      - dns
+    depends_on:
+      - prometheus-node-exporter
+    environment:
+      VIRTUAL_HOST: node-stats.liquibrium.local
+      NETWORK_ACCESS: internal
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+    networks:
+      operations_intranet:
+        ipv4_address: 172.30.23.9
+
+  proxy-alertmanager:
+    build: ./proxy-alertmanager
+    image: registry.liquibrium.com/proxy-alertmanager
+    container_name: prometheus-alertmanager
+    dns: ${DNS_IP}
+    external_links:
+      - container-registry
+      - dns
+    depends_on:
+      - prometheus-alertmanager
+    environment:
+      VIRTUAL_HOST: alertmanager.liquibrium.local
+      NETWORK_ACCESS: internal
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+    networks:
+      operations_intranet:
+        ipv4_address: 172.30.23.10
+
+  proxy-cadvisor:
+    build: ./proxy-cadvisor
+    image: registry.liquibrium.com/proxy-cadvisor
+    container_name: prometheus-cadvisor
+    dns: ${DNS_IP}
+    external_links:
+      - container-registry
+      - dns
+    depends_on:
+      - prometheus-cadvisor
+    environment:
+      VIRTUAL_HOST: cadvisor.liquibrium.local
+      NETWORK_ACCESS: internal
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+    networks:
+      operations_intranet:
+        ipv4_address: 172.30.23.11
+
+networks:
+  operations_intranet:
+    external: true
 

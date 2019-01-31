@@ -1,0 +1,7 @@
+*.env filter=git-crypt diff=git-crypt
+*.ovpn filter=git-crypt diff=git-crypt
+*.log filter=git-crypt diff=git-crypt
+config.yml filter=git-crypt diff=git-crypt
+grafana.ini filter=git-crypt diff=git-crypt
+ldap.toml filter=git-crypt diff=git-crypt
+config.monitoring filter=git-crypt diff=git-crypt
