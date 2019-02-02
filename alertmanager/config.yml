@@ -17,3 +17,4 @@ receivers:
             smarthost: smtp.mailgun.org:587
             auth_username: postmaster@mail.liquibrium.com
             auth_password: f31b3637d494e42abb9627b70abd3993-c1fe131e-7bb72076
+            hello: alertmanager.liquibrium.local

@@ -1,5 +1,5 @@
 groups:
-- name: example
+- name: liquibrium.local
   rules:
 
   # Alert for any instance that is unreachable for >5 minutes.
@@ -13,10 +13,19 @@ groups:
       description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
 
   - alert: high_load
-    expr: node_load1 > 0.5
+    expr: node_load1 > 2.0
     for: 2m
     labels:
       severity: page
     annotations:
       summary: "Instance {{ $labels.instance }} under high load"
       description: "{{ $labels.instance }} of job {{ $labels.job }} is under high load."
+
+  - alert: high_load
+    expr: rate(container_cpu_user_seconds_total[30s]) > 0.4
+    for: 2m
+    labels:
+      severity: page 
+    annotations:
+      summary: "Instance {{ $labels.container_label_com_docker_swarm_service_name }} {{ $labels.instance }} under high load"
+      description: "{{ $labels.instance }} of job {{ $labels.job }} is under high load. taks id is {{ $labels.id }}. container {{ $labels.container_label_com_docker_swarm_service_name }} of stack {{ $labels.container_label_com_docker_stack_namespace }}. Fullname is {{ $labels.name }}"
