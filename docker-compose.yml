@@ -16,10 +16,6 @@ services:
     depends_on:
       - prometheus-cadvisor
     restart: always
-    deploy:
-      placement:
-        constraints:
-          - node.role==manager
     env_file:
       - ./prometheus.env
     networks:
@@ -27,6 +23,11 @@ services:
         ipv4_address: 172.30.23.2
         aliases:
           - prometheus
+    deploy:
+      placement:
+        constraints:
+          - node.labels.type == intranet
+          - node.role == manager
 
   prometheus-node-exporter:
     image: prom/node-exporter
@@ -68,10 +69,6 @@ services:
     command:
       - '--config.file=/etc/alertmanager/config.yml'
       - '--storage.path=/alertmanager'
-    deploy:
-      placement:
-        constraints:
-           - node.role==manager
     env_file:
       - ./prometheus.env
     networks:
@@ -79,6 +76,11 @@ services:
         ipv4_address: 172.30.23.4
         aliases:
           - prometheus-alertmanager
+    deploy:
+      placement:
+        constraints:
+          - node.labels.type == intranet
+          - node.role == manager
 
   prometheus-cadvisor:
     image: google/cadvisor
@@ -125,6 +127,10 @@ services:
         ipv4_address: 172.30.23.6
         aliases:
           - grafana
+    deploy:
+      placement:
+        constraints:
+          - node.labels.type == intranet
 
   proxy-grafana:
     build: ./proxy-grafana
@@ -139,13 +145,14 @@ services:
     environment:
       VIRTUAL_HOST: monitor.liquibrium.local
       NETWORK_ACCESS: internal
-    deploy:
-      placement:
-        constraints:
-          - node.role == manager
     networks:
       operations_intranet:
         ipv4_address: 172.30.23.7
+    deploy:
+      placement:
+        constraints:
+          - node.labels.type == intranet
+          - node.labels.proxy == true
 
   proxy-prometheus:
     build: ./proxy-prometheus
@@ -160,13 +167,14 @@ services:
     environment:
       VIRTUAL_HOST: prometheus.liquibrium.local
       NETWORK_ACCESS: internal
-    deploy:
-      placement:
-        constraints:
-          - node.role == manager
     networks:
       operations_intranet:
         ipv4_address: 172.30.23.8
+    deploy:
+      placement:
+        constraints:
+          - node.labels.type == intranet
+          - node.labels.proxy == true
 
   proxy-node-stats:
     build: ./proxy-node-stats
@@ -181,13 +189,14 @@ services:
     environment:
       VIRTUAL_HOST: node-stats.liquibrium.local
       NETWORK_ACCESS: internal
-    deploy:
-      placement:
-        constraints:
-          - node.role == manager
     networks:
       operations_intranet:
         ipv4_address: 172.30.23.9
+    deploy:
+      placement:
+        constraints:
+          - node.labels.type == intranet
+          - node.labels.proxy == true
 
   proxy-alertmanager:
     build: ./proxy-alertmanager
@@ -202,13 +211,14 @@ services:
     environment:
       VIRTUAL_HOST: alertmanager.liquibrium.local
       NETWORK_ACCESS: internal
-    deploy:
-      placement:
-        constraints:
-          - node.role == manager
     networks:
       operations_intranet:
         ipv4_address: 172.30.23.10
+    deploy:
+      placement:
+        constraints:
+          - node.labels.type == intranet
+          - node.labels.proxy == true
 
   proxy-cadvisor:
     build: ./proxy-cadvisor
@@ -223,13 +233,14 @@ services:
     environment:
       VIRTUAL_HOST: cadvisor.liquibrium.local
       NETWORK_ACCESS: internal
-    deploy:
-      placement:
-        constraints:
-          - node.role == manager
     networks:
       operations_intranet:
         ipv4_address: 172.30.23.11
+    deploy:
+      placement:
+        constraints:
+          - node.labels.type == intranet
+          - node.labels.proxy == true
 
 networks:
   operations_intranet:
