@@ -28,6 +28,11 @@ services:
         constraints:
           - node.labels.type == intranet
           - node.role == manager
+    logging:
+      driver: "fluentd"
+      options:
+        tag: "{{.Name}}.{{.ID}}"
+        fluentd-async-connect: "true"
 
   prometheus-node-exporter:
     image: prom/node-exporter
@@ -54,6 +59,11 @@ services:
         ipv4_address: 172.30.23.3
         aliases:
           - prometheus-node-exporter
+    logging:
+      driver: "fluentd"
+      options:
+        tag: "{{.Name}}.{{.ID}}"
+        fluentd-async-connect: "true"
 
   prometheus-alertmanager:
     image: prom/alertmanager
@@ -81,6 +91,11 @@ services:
         constraints:
           - node.labels.type == intranet
           - node.role == manager
+    logging:
+      driver: "fluentd"
+      options:
+        tag: "{{.Name}}.{{.ID}}"
+        fluentd-async-connect: "true"
 
   prometheus-cadvisor:
     image: google/cadvisor
@@ -103,6 +118,11 @@ services:
         ipv4_address: 172.30.23.5
         aliases:
           - prometheus-cadvisor
+    logging:
+      driver: "fluentd"
+      options:
+        tag: "{{.Name}}.{{.ID}}"
+        fluentd-async-connect: "true"
 
   grafana:
     image: grafana/grafana
@@ -131,6 +151,11 @@ services:
       placement:
         constraints:
           - node.labels.type == intranet
+    logging:
+      driver: "fluentd"
+      options:
+        tag: "{{.Name}}.{{.ID}}"
+        fluentd-async-connect: "true"
 
   proxy-grafana:
     build: ./proxy-grafana
@@ -153,6 +178,11 @@ services:
         constraints:
           - node.labels.type == intranet
           - node.labels.proxy == true
+    logging:
+      driver: "fluentd"
+      options:
+        tag: "{{.Name}}.{{.ID}}"
+        fluentd-async-connect: "true"
 
   proxy-prometheus:
     build: ./proxy-prometheus
@@ -175,6 +205,11 @@ services:
         constraints:
           - node.labels.type == intranet
           - node.labels.proxy == true
+    logging:
+      driver: "fluentd"
+      options:
+        tag: "{{.Name}}.{{.ID}}"
+        fluentd-async-connect: "true"
 
   proxy-node-stats:
     build: ./proxy-node-stats
@@ -197,6 +232,11 @@ services:
         constraints:
           - node.labels.type == intranet
           - node.labels.proxy == true
+    logging:
+      driver: "fluentd"
+      options:
+        tag: "{{.Name}}.{{.ID}}"
+        fluentd-async-connect: "true"
 
   proxy-alertmanager:
     build: ./proxy-alertmanager
@@ -219,6 +259,11 @@ services:
         constraints:
           - node.labels.type == intranet
           - node.labels.proxy == true
+    logging:
+      driver: "fluentd"
+      options:
+        tag: "{{.Name}}.{{.ID}}"
+        fluentd-async-connect: "true"
 
   proxy-cadvisor:
     build: ./proxy-cadvisor
@@ -241,6 +286,11 @@ services:
         constraints:
           - node.labels.type == intranet
           - node.labels.proxy == true
+    logging:
+      driver: "fluentd"
+      options:
+        tag: "{{.Name}}.{{.ID}}"
+        fluentd-async-connect: "true"
 
 networks:
   operations_intranet:
