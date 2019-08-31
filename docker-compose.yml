@@ -68,9 +68,9 @@ services:
   prometheus-alertmanager:
     image: prom/alertmanager
     container_name: prometheus-alertmanager
-    dns: ${DNS_IP}
-    external_links:
-      - dns
+    #    dns: ${DNS_IP}
+    #   external_links:
+    #   - dns
     volumes:
       - "./alertmanager/:/etc/alertmanager/"
     networks:
@@ -291,6 +291,26 @@ services:
             #      options:
             #        tag: "{{.Name}}.{{.ID}}"
             #        fluentd-async-connect: "true"
+
+  alertmanager-bot:
+    image: metalmatze/alertmanager-bot:0.4.0
+    container_name: alertmanager-bot
+    external_links:
+      - container-registry
+    environment:
+      ALERTMANAGER_URL: http://prometheus-alertmanager:9093
+      BOLT_PATH: /data/bot.db
+      STORE: bolt
+      TEMPLATE_PATHS: /templates/default.tmpl
+    env_file:
+      - ./prometheus.env
+    networks:
+      operations_intranet:
+        ipv4_address: 172.30.23.12
+        aliases:
+          - alertmanager-bot
+    volumes:
+    - ${DATA_DIR}/alertmanager-bot:/data
 
 networks:
   operations_intranet:
