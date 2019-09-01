@@ -312,6 +312,58 @@ services:
     volumes:
     - ${DATA_DIR}/alertmanager-bot:/data
 
+  blackbox-exporter:
+    image: prom/blackbox-exporter
+    container_name: prometheus
+    dns: ${DNS_IP}
+    external_links:
+      - dns
+    volumes:
+      - ./blackbox-exporter:/config
+    command:
+      - '--config.file=/config/blackbox.yml'
+    depends_on:
+      - prometheus
+    restart: always
+    env_file:
+      - ./prometheus.env
+    networks:
+      operations_intranet:
+        ipv4_address: 172.30.23.13
+        aliases:
+          - blackbox-exporter
+    deploy:
+      placement:
+        constraints:
+          - node.labels.type == intranet
+            #    logging:
+            #      driver: "fluentd"
+            #      options:
+            #        tag: "{{.Name}}.{{.ID}}"
+            #        fluentd-async-connect: "true"
+
+  proxy-blackbox:
+    build: ./proxy-blackbox
+    image: registry.liquibrium.com/proxy-blackbox
+    container_name: proxy-blackboxr
+    dns: ${DNS_IP}
+    external_links:
+      - container-registry
+      - dns
+    depends_on:
+      - blackbox-exporter
+    environment:
+      VIRTUAL_HOST: blackbox-exporter.liquibrium.local
+      NETWORK_ACCESS: internal
+    networks:
+      operations_intranet:
+        ipv4_address: 172.30.23.14
+    deploy:
+      placement:
+        constraints:
+          - node.labels.type == intranet
+          - node.labels.proxy == true
+
 networks:
   operations_intranet:
     external: true

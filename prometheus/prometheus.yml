@@ -34,8 +34,8 @@ scrape_configs:
     scrape_interval: 5s
 
     static_configs:
-         - targets: ['localhost:9090']
-
+    - targets:
+      - "localhost:9090"
 
   - job_name: 'cadvisor'
 
@@ -64,3 +64,46 @@ scrape_configs:
     
 #     static_configs:
 #          - targets: ['node-exporter:9100']
+
+  - job_name: 'blackbox'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]  # Look for a HTTP 200 response.
+    static_configs:
+      - targets:
+        - http://prometheus.io    # Target to probe with http.
+        - https://blackbox-exporter.liquibrium.local
+        - http://blackbox-exporter:9115
+        - http://blackbox-exporter.operations_intranet:9115
+        - https://ca.liquibrium.local
+        - https://directory.liquibrium.local
+        - https://clouddb.liquibrium.local
+        - https://vcsdb.liquibrium.local
+        - https://mattermostdb.liquibrium.local
+        - https://surveydb.liquibrium.local
+        - https://password.liquibrium.local
+        - https://trackingdb.liquibrium.local
+        - https://monitor.liquibrium.local
+        - https://browser.liquibrium.local
+        - https://cloudredis.liquibrium.local
+        - https://vcs.liquibrium.local
+        - https://tracking.liquibrium.local
+        - https://tasks.liquibrium.local
+        - https://chat.liquibrium.local
+        - https://survey.liquibrium.local
+        - https://cloud.liquibrium.local
+        - https://office.liquibrium.local
+        - https://draw.liquibrium.local
+        - https://keychain.liquibrium.local
+        - https://sync.liquibrium.local
+        - https://backup.liquibrium.local
+        - https://helpdesk.liquibrium.local
+        - https://packages.liquibrium.local
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115  # The blackbox exporter's real hostname:port.
+
