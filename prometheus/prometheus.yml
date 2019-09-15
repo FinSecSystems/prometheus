@@ -99,6 +99,7 @@ scrape_configs:
         - https://backup.liquibrium.local
         - https://helpdesk.liquibrium.local
         - https://packages.liquibrium.local
+        - https://dashboard.liquibrium.local
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
