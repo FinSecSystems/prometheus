@@ -159,7 +159,7 @@ services:
 
   proxy-grafana:
     build: ./proxy-grafana
-    image: registry.liquibrium.com/proxy-grafana
+    image: registry.liquibrium.local/proxy-grafana
     container_name: grafana-proxy
     dns: ${DNS_IP}
     external_links:
@@ -186,7 +186,7 @@ services:
 
   proxy-prometheus:
     build: ./proxy-prometheus
-    image: registry.liquibrium.com/proxy-prometheus
+    image: registry.liquibrium.local/proxy-prometheus
     container_name: prometheus-proxy
     dns: ${DNS_IP}
     external_links:
@@ -213,7 +213,7 @@ services:
 
   proxy-node-stats:
     build: ./proxy-node-stats
-    image: registry.liquibrium.com/proxy-node-stats
+    image: registry.liquibrium.local/proxy-node-stats
     container_name: prometheus-node-stats
     dns: ${DNS_IP}
     external_links:
@@ -240,7 +240,7 @@ services:
 
   proxy-alertmanager:
     build: ./proxy-alertmanager
-    image: registry.liquibrium.com/proxy-alertmanager
+    image: registry.liquibrium.local/proxy-alertmanager
     container_name: prometheus-alertmanager
     dns: ${DNS_IP}
     external_links:
@@ -267,7 +267,7 @@ services:
 
   proxy-cadvisor:
     build: ./proxy-cadvisor
-    image: registry.liquibrium.com/proxy-cadvisor
+    image: registry.liquibrium.local/proxy-cadvisor
     container_name: prometheus-cadvisor
     dns: ${DNS_IP}
     external_links:
@@ -344,7 +344,7 @@ services:
 
   proxy-blackbox:
     build: ./proxy-blackbox
-    image: registry.liquibrium.com/proxy-blackbox
+    image: registry.liquibrium.local/proxy-blackbox
     container_name: proxy-blackboxr
     dns: ${DNS_IP}
     external_links:
