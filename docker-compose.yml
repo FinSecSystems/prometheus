@@ -2,9 +2,9 @@ version: '3.4'
 
 services:
 
-  prometheus:
+  app:
     image: prom/prometheus
-    container_name: prometheus
+    container_name: prometheus-app
     volumes:
       - ./prometheus/:/etc/prometheus/
       - ${DATA_DIR}/prometheus:/prometheus:rw
@@ -14,36 +14,23 @@ services:
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
     depends_on:
-      - prometheus-cadvisor
+      - cadvisor
     restart: always
     env_file:
       - ./prometheus.env
     networks:
       operations_intranet:
-        ipv4_address: 172.30.23.2
+        ipv4_address: 172.34.7.2
         aliases:
           - prometheus
-    deploy:
-      placement:
-        constraints:
-          - node.labels.type == intranet
-          - node.role == manager
-            #    logging:
-            #      driver: "fluentd"
-            #      options:
-            #        tag: "{{.Name}}.{{.ID}}"
-            #        fluentd-async-connect: "true"
 
-  prometheus-node-exporter:
+  node-exporter:
     image: prom/node-exporter
     container_name: prometheus-node-exporter
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /:/rootfs:ro
-    dns: ${DNS_IP}
-    external_links:
-      - dns
     command: 
       - '--path.procfs=/host/proc' 
       - '--path.sysfs=/host/sys'
@@ -56,53 +43,27 @@ services:
       - ./prometheus.env
     networks:
       operations_intranet:
-        ipv4_address: 172.30.23.3
-        aliases:
-          - prometheus-node-exporter
-            #    logging:
-            #      driver: "fluentd"
-            #      options:
-            #        tag: "{{.Name}}.{{.ID}}"
-            #        fluentd-async-connect: "true"
+        ipv4_address: 172.34.7.3
 
-  prometheus-alertmanager:
+  alertmanager:
     image: prom/alertmanager
     container_name: prometheus-alertmanager
-    #    dns: ${DNS_IP}
-    #   external_links:
-    #   - dns
     volumes:
       - "./alertmanager/:/etc/alertmanager/"
-    networks:
-      - monitor-net
     restart: always
     command:
       - '--config.file=/etc/alertmanager/config.yml'
       - '--storage.path=/alertmanager'
+      - '--cluster.advertise-address=172.34.7.4:9093'
     env_file:
       - ./prometheus.env
     networks:
       operations_intranet:
-        ipv4_address: 172.30.23.4
-        aliases:
-          - prometheus-alertmanager
-    deploy:
-      placement:
-        constraints:
-          - node.labels.type == intranet
-          - node.role == manager
-            #    logging:
-            #      driver: "fluentd"
-            #      options:
-            #        tag: "{{.Name}}.{{.ID}}"
-            #        fluentd-async-connect: "true"
+        ipv4_address: 172.34.7.4
 
-  prometheus-cadvisor:
+  cadvisor:
     image: google/cadvisor
     container_name: prometheus-cadvisor
-    dns: ${DNS_IP}
-    external_links:
-      - dns
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:rw
@@ -115,23 +76,13 @@ services:
       - ./prometheus.env
     networks:
       operations_intranet:
-        ipv4_address: 172.30.23.5
-        aliases:
-          - prometheus-cadvisor
-            #    logging:
-            #      driver: "fluentd"
-            #      options:
-            #        tag: "{{.Name}}.{{.ID}}"
-            #        fluentd-async-connect: "true"
+        ipv4_address: 172.34.7.5
 
   grafana:
     image: grafana/grafana
-    container_name: grafana
-    dns: ${DNS_IP}
-    external_links:
-      - dns
+    container_name: prometheus-grafana
     depends_on:
-      - prometheus
+      - app
     volumes:
       - ${DATA_DIR}/grafana:/var/lib/grafana:rw
       - ./grafana/provisioning/:/etc/grafana/provisioning/
@@ -144,159 +95,86 @@ services:
       - ./prometheus.env
     networks:
       operations_intranet:
-        ipv4_address: 172.30.23.6
-        aliases:
-          - grafana
-    deploy:
-      placement:
-        constraints:
-          - node.labels.type == intranet
-            #    logging:
-            #      driver: "fluentd"
-            #      options:
-            #        tag: "{{.Name}}.{{.ID}}"
-            #        fluentd-async-connect: "true"
+        ipv4_address: 172.34.7.6
 
-  proxy-grafana:
-    build: ./proxy-grafana
-    image: registry.liquibrium.local/proxy-grafana
-    container_name: grafana-proxy
-    dns: ${DNS_IP}
-    external_links:
-      - container-registry
-      - dns
+  grafana-proxy-internal:
+    image: registry.finsec.localdomain/proxy-nginx
+    container_name: prometheus-grafana-proxy-internal
     depends_on:
       - grafana
     environment:
-      VIRTUAL_HOST: monitor.liquibrium.local
+      VIRTUAL_HOST: monitor.finsec.localdomain
       NETWORK_ACCESS: internal
+    volumes:
+      - ./grafana-nginx.conf:/etc/nginx/nginx.conf
     networks:
       operations_intranet:
-        ipv4_address: 172.30.23.7
-    deploy:
-      placement:
-        constraints:
-          - node.labels.type == intranet
-          - node.labels.proxy == true
-            #    logging:
-            #      driver: "fluentd"
-            #      options:
-            #        tag: "{{.Name}}.{{.ID}}"
-            #        fluentd-async-connect: "true"
+        ipv4_address: 172.34.7.7
+        aliases:
+         - monitor.finsec
+         - monitor
 
-  proxy-prometheus:
-    build: ./proxy-prometheus
-    image: registry.liquibrium.local/proxy-prometheus
-    container_name: prometheus-proxy
-    dns: ${DNS_IP}
-    external_links:
-      - container-registry
-      - dns
+  app-proxy-internal:
+    image: registry.finsec.localdomain/proxy-nginx
+    container_name: prometheus-app-proxy-internal
     depends_on:
-      - prometheus
+      - app
     environment:
-      VIRTUAL_HOST: prometheus.liquibrium.local
+      VIRTUAL_HOST: prometheus.finsec.localdomain
       NETWORK_ACCESS: internal
+    volumes:
+      - ./app-nginx.conf:/etc/nginx/nginx.conf
     networks:
       operations_intranet:
-        ipv4_address: 172.30.23.8
-    deploy:
-      placement:
-        constraints:
-          - node.labels.type == intranet
-          - node.labels.proxy == true
-            #    logging:
-            #      driver: "fluentd"
-            #      options:
-            #        tag: "{{.Name}}.{{.ID}}"
-            #        fluentd-async-connect: "true"
+        ipv4_address: 172.34.7.8
+        aliases:
+          - prometheus.finsec
 
-  proxy-node-stats:
-    build: ./proxy-node-stats
-    image: registry.liquibrium.local/proxy-node-stats
-    container_name: prometheus-node-stats
-    dns: ${DNS_IP}
-    external_links:
-      - container-registry
-      - dns
+  node-stats-proxy-internal:
+    image: registry.finsec.localdomain/proxy-nginx
+    container_name: prometheus-node-stats-proxy-internal
     depends_on:
-      - prometheus-node-exporter
+      - node-exporter
     environment:
-      VIRTUAL_HOST: node-stats.liquibrium.local
+      VIRTUAL_HOST: node-stats.finsec.localdomain
       NETWORK_ACCESS: internal
+    volumes:
+      - ./node-stats-nginx.conf:/etc/nginx/nginx.conf
     networks:
       operations_intranet:
-        ipv4_address: 172.30.23.9
-    deploy:
-      placement:
-        constraints:
-          - node.labels.type == intranet
-          - node.labels.proxy == true
-            #    logging:
-            #      driver: "fluentd"
-            #      options:
-            #        tag: "{{.Name}}.{{.ID}}"
-            #        fluentd-async-connect: "true"
+        ipv4_address: 172.34.7.9
 
-  proxy-alertmanager:
-    build: ./proxy-alertmanager
-    image: registry.liquibrium.local/proxy-alertmanager
-    container_name: prometheus-alertmanager
-    dns: ${DNS_IP}
-    external_links:
-      - container-registry
-      - dns
+  alertmanager-proxy-internal:
+    image: registry.finsec.localdomain/proxy-nginx
+    container_name: prometheus-alertmanager-proxy-internal
     depends_on:
-      - prometheus-alertmanager
+      - alertmanager
     environment:
-      VIRTUAL_HOST: alertmanager.liquibrium.local
+      VIRTUAL_HOST: alertmanager.finsec.localdomain
       NETWORK_ACCESS: internal
+    volumes:
+      - ./alertmanager-nginx.conf:/etc/nginx/nginx.conf
     networks:
       operations_intranet:
-        ipv4_address: 172.30.23.10
-    deploy:
-      placement:
-        constraints:
-          - node.labels.type == intranet
-          - node.labels.proxy == true
-            #    logging:
-            #      driver: "fluentd"
-            #      options:
-            #        tag: "{{.Name}}.{{.ID}}"
-            #        fluentd-async-connect: "true"
+        ipv4_address: 172.34.7.10
 
-  proxy-cadvisor:
-    build: ./proxy-cadvisor
-    image: registry.liquibrium.local/proxy-cadvisor
-    container_name: prometheus-cadvisor
-    dns: ${DNS_IP}
-    external_links:
-      - container-registry
-      - dns
+  cadvisor-proxy-internal:
+    image: registry.finsec.localdomain/proxy-nginx
+    container_name: prometheus-cadvisor-proxy-internal
     depends_on:
-      - prometheus-cadvisor
+      - cadvisor
     environment:
-      VIRTUAL_HOST: cadvisor.liquibrium.local
+      VIRTUAL_HOST: cadvisor.finsec.localdomain
       NETWORK_ACCESS: internal
+    volumes:
+      - ./cadvisor-nginx.conf:/etc/nginx/nginx.conf
     networks:
       operations_intranet:
-        ipv4_address: 172.30.23.11
-    deploy:
-      placement:
-        constraints:
-          - node.labels.type == intranet
-          - node.labels.proxy == true
-            #    logging:
-            #      driver: "fluentd"
-            #      options:
-            #        tag: "{{.Name}}.{{.ID}}"
-            #        fluentd-async-connect: "true"
+        ipv4_address: 172.34.7.11
 
   alertmanager-bot:
     image: metalmatze/alertmanager-bot:0.4.0
-    container_name: alertmanager-bot
-    external_links:
-      - container-registry
+    container_name: prometheus-alertmanager-bot
     environment:
       ALERTMANAGER_URL: http://prometheus-alertmanager:9093
       BOLT_PATH: /data/bot.db
@@ -304,67 +182,42 @@ services:
       TEMPLATE_PATHS: /templates/default.tmpl
     env_file:
       - ./prometheus.env
+    volumes:
+      - ${DATA_DIR}/alertmanager-bot:/data
     networks:
       operations_intranet:
-        ipv4_address: 172.30.23.12
-        aliases:
-          - alertmanager-bot
-    volumes:
-    - ${DATA_DIR}/alertmanager-bot:/data
+        ipv4_address: 172.34.7.12
 
   blackbox-exporter:
     image: prom/blackbox-exporter
-    container_name: prometheus
-    dns: ${DNS_IP}
-    external_links:
-      - dns
+    container_name: prometheus-blackbox-exporter
     volumes:
       - ./blackbox-exporter:/config
     command:
       - '--config.file=/config/blackbox.yml'
     depends_on:
-      - prometheus
+      - app
     restart: always
     env_file:
       - ./prometheus.env
     networks:
       operations_intranet:
-        ipv4_address: 172.30.23.13
-        aliases:
-          - blackbox-exporter
-    deploy:
-      placement:
-        constraints:
-          - node.labels.type == intranet
-            #    logging:
-            #      driver: "fluentd"
-            #      options:
-            #        tag: "{{.Name}}.{{.ID}}"
-            #        fluentd-async-connect: "true"
+        ipv4_address: 172.34.7.13
 
-  proxy-blackbox:
-    build: ./proxy-blackbox
-    image: registry.liquibrium.local/proxy-blackbox
-    container_name: proxy-blackboxr
-    dns: ${DNS_IP}
-    external_links:
-      - container-registry
-      - dns
+  blackbox-exporter-proxy-internal:
+    image: registry.finsec.localdomain/proxy-nginx
+    container_name: prometheus-blackbox-exporter-proxy-internal
     depends_on:
       - blackbox-exporter
     environment:
-      VIRTUAL_HOST: blackbox-exporter.liquibrium.local
+      VIRTUAL_HOST: blackbox-exporter.finsec.localdomain
       NETWORK_ACCESS: internal
+    volumes:
+      - ./blackbox-exporter-nginx.conf:/etc/nginx/nginx.conf
     networks:
       operations_intranet:
-        ipv4_address: 172.30.23.14
-    deploy:
-      placement:
-        constraints:
-          - node.labels.type == intranet
-          - node.labels.proxy == true
+        ipv4_address: 172.34.7.14
 
 networks:
   operations_intranet:
     external: true
-

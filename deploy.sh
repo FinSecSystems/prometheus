@@ -1,1 +1,1 @@
-../scripts/deploy_stack.sh
+../scripts/deploy.sh

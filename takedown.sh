@@ -1,1 +1,1 @@
-../scripts/takedown_stack.sh
+../scripts/takedown.sh

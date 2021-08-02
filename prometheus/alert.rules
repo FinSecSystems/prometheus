@@ -1,5 +1,5 @@
 groups:
-- name: liquibrium.local
+- name: finsec.localdomain
   rules:
 
   # Alert for any instance that is unreachable for >5 minutes.
