@@ -9,8 +9,17 @@ groups:
     labels:
       severity: page
     annotations:
-      summary: "Instance {{ $labels.instance }} down"
-      description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 2 minutes."
+      summary: "{{ $labels.instance }} down"
+      description: "{{ $labels.instance }} has been down for more than 2 minutes."
+
+  - alert: http_service_down
+    expr: probe_http_status_code != 200 and probe_http_status_code != 0
+    for: 2m
+    labels:
+      severity: page
+    annotations:
+      summary: "{{ $labels.instance }} HTTP Status is not OK"
+      description: "{{ $labels.instance }} of has been not returning 200-OK for more than 2 minutes."
 
   - alert: high_machine_load
     expr: rate(node_load1[600s]) > 0.6
@@ -18,17 +27,17 @@ groups:
     labels:
       severity: page 
     annotations:
-      summary: "Instance {{ $labels.instance }} under high load"
-      description: "{{ $labels.instance }} of job {{ $labels.job }} is under high load."
+      summary: "{{ $labels.instance }} under high load"
+      description: "{{ $labels.instance }} is under high load."
 
   - alert: high_service_load
-    expr: rate(container_cpu_user_seconds_total[600s]) > 2.0
+    expr: rate(container_cpu_user_seconds_total[600s]) > 1.5
     for: 2m
     labels:
       severity: page 
     annotations:
-      summary: "Instance {{ $labels.container_label_com_docker_swarm_service_name }} {{ $labels.instance }} under high load"
-      description: "{{ $labels.instance }} of job {{ $labels.job }} is under high load. taks id is {{ $labels.id }}. container {{ $labels.container_label_com_docker_swarm_service_name }} of stack {{ $labels.container_label_com_docker_stack_namespace }}. Fullname is {{ $labels.name }}"
+      summary: "{{ $labels.container_label_com_docker_swarm_service_name }} {{ $labels.instance }} under high load"
+      description: "{{ $labels.instance }} is under high load. taks id is {{ $labels.id }}. container {{ $labels.container_label_com_docker_swarm_service_name }} of stack {{ $labels.container_label_com_docker_stack_namespace }}. Fullname is {{ $labels.name }}"
 
   - alert: low_disk_space
     expr: node_filesystem_free_bytes/node_filesystem_size_bytes*100 < 10
@@ -36,6 +45,6 @@ groups:
     labels:
       severity: page
     annotations:
-      summary: "Instance {{ $labels.instance }} has < 10% disk space left"
-      description: "{{ $labels.instance }} of job {{ $labels.job }} is low on disk space."
+      summary: "{{ $labels.instance }} has < 10% disk space left"
+      description: "{{ $labels.instance }} is low on disk space."
 

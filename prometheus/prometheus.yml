@@ -48,8 +48,8 @@ scrape_configs:
       type: 'A'
       port: 8080
 
-#     static_configs:
-#          - targets: ['cadvisor:8080']
+    static_configs:
+    - targets: ['prometheus-cadvisor:8080']
 
   - job_name: 'node-exporter'
 
@@ -62,8 +62,8 @@ scrape_configs:
       type: 'A'
       port: 9100
     
-#     static_configs:
-#          - targets: ['node-exporter:9100']
+    static_configs:
+    - targets: ['prometheus-node-exporter:9100']
 
   - job_name: 'blackbox'
     metrics_path: /probe
@@ -72,34 +72,81 @@ scrape_configs:
     static_configs:
       - targets:
         - http://prometheus.io    # Target to probe with http.
-        - https://blackbox-exporter.finsec.localdomain
-        - http://blackbox-exporter:9115
-        - http://blackbox-exporter.operations_intranet:9115
+#operations
+        - https://dns.finsec.localdomain
+        - https://registry.finsec.localdomain/v2
         - https://ca.finsec.localdomain
-        - https://directory.finsec.localdomain
-        - https://clouddb.finsec.localdomain
-        - https://vcsdb.finsec.localdomain
-        - https://mattermostdb.finsec.localdomain
-        - https://surveydb.finsec.locadomain
-        - https://password.finsec.localdomain
-        - https://trackingdb.finsec.localdomain
-        - https://monitor.finsec.localdomain
+        - https://operations.finsec.localdomain
+        - https://errors.finsec.localdomain
+#bitwarden          
+        - https://keychain.finsec.localdomain
+#debug          
         - https://browser.finsec.localdomain
-        - https://cloudredis.finsec.localdomain
+#directory
+        - https://directory.finsec.localdomain
+        - https://password.finsec.localdomain
+#gitlab
+        - https://vcsdb.finsec.localdomain
         - https://vcs.finsec.localdomain
-        - https://tracking.finsec.localdomain
-        - https://tasks.finsec.localdomain
-        - https://chat.finsec.localdomain
+        - https://packages.finsec.localdomain
+        - https://dashboard.finsec.localdomain
+        - https://browser.containers.finsec.localdomain
+        - https://containers.finsec.localdomain/v2
+        - https://diagram.finsec.localdomain
+          #        - https://projects.finsec.localdomain TBD
+#helpdesk
+        - https://helpdesk.finsec.localdomain
+        - https://helpdeskdb.finsec.localdomain
+#firefox
+        - https://sync.finsec.localdomain
+#limesurvey          
+        - https://surveydb.finsec.locadomain
         - https://survey.finsec.localdomain
+#management
+        - https://browser.registry.finsec.localdomain
+        - https://portainer.finsec.localdomain          
+#matomo          
+        - https://trackingdb.finsec.localdomain
+        - https://tracking.finsec.localdomain
+#mattermost          
+        - https://chatdb.finsec.localdomain
+        - https://chat.finsec.localdomain
+#minio
+#        - https://storage.finsec.localdomain  # s3 protocol
+        - https://console.storage.finsec.localdomain
+#prometheus          
+        - https://blackbox-exporter.finsec.localdomain
+        - https://monitor.finsec.localdomain
+        - https://prometheus.finsec.localdomain
+        - https://node-stats.finsec.localdomain
+        - https://alertmanager.finsec.localdomain
+        - https://cadvisor.finsec.localdomain
+        - https://blackbox-exporter.finsec.localdomain
+#nextcloud          
+        - https://clouddb.finsec.localdomain
+        - https://cloudb.finsec.localdomain
+        - https://cloudredis.finsec.localdomain
         - https://cloud.finsec.localdomain
         - https://office.finsec.localdomain
         - https://draw.finsec.localdomain
-        - https://keychain.finsec.localdomain
-        - https://sync.finsec.localdomain
-        - https://backup.finsec.localdomain
-        - https://helpdesk.finsec.localdomain
-        - https://packages.finsec.localdomain
-        - https://dashboard.finsec.localdomain
+#openproject
+        - https://tasks.finsec.localdomain
+#external
+        - https://explorer.bitcoin.finsec.localdomain
+        - https://ronin.bitcoin.finsec.localdomain          
+        - https://dojo.bitcoin.finsec.localdomain       
+        - https://specter.bitcoin.finsec.localdomain 
+#external(ravage)          
+        - https://umbrel.bitcoin.finsec.localdomain
+        - https://mempool.bitcoin.finsec.localdomain
+        - https://backup.explorer.bitcoin.finsec.localdomain
+        - https://pay.bitcoin.finsec.localdomain
+        - https://terminal.lightning.finsec.localdomain
+        - https://lnbits.lighting.finsec.localdomain
+        - https://rtl.lightning.finsec.localdomain
+        - https://backup.dojo.bitcoin.finsec.localdomain
+        - https://thunderhub.lightning.finsec.localdomain
+        - https://backup.specter.bitcoin.finsec.localdomain 
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
