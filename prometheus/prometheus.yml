@@ -100,7 +100,7 @@ scrape_configs:
 #firefox
         - https://sync.finsec.localdomain
 #limesurvey          
-        - https://surveydb.finsec.locadomain
+        - https://surveydb.finsec.localdomain
         - https://survey.finsec.localdomain
 #management
         - https://browser.registry.finsec.localdomain
@@ -121,7 +121,6 @@ scrape_configs:
         - https://node-stats.finsec.localdomain
         - https://alertmanager.finsec.localdomain
         - https://cadvisor.finsec.localdomain
-        - https://blackbox-exporter.finsec.localdomain
 #nextcloud          
         - https://clouddb.finsec.localdomain
         - https://cloudb.finsec.localdomain
@@ -142,7 +141,7 @@ scrape_configs:
         - https://backup.explorer.bitcoin.finsec.localdomain
         - https://pay.bitcoin.finsec.localdomain
         - https://terminal.lightning.finsec.localdomain
-        - https://lnbits.lighting.finsec.localdomain
+        - https://lnbits.lightning.finsec.localdomain
         - https://rtl.lightning.finsec.localdomain
         - https://backup.dojo.bitcoin.finsec.localdomain
         - https://thunderhub.lightning.finsec.localdomain
