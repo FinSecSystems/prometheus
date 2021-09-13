@@ -105,7 +105,18 @@ services:
       - /var/run:/var/run:rw
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
+      - /sys/fs/cgroup:/cgroup:ro
+      - /dev/disk/:/dev/disk:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     restart: always
+    devices:
+      - /dev/kmsg:/dev/kmsg
+    security_opt:
+      - no-new-privileges:true
+    command:
+      - '-allow_dynamic_housekeeping=false'
+      - '-housekeeping_interval=10s'
+      - '-docker_only=true'
     deploy:
       mode: global
     env_file:
@@ -130,7 +141,7 @@ services:
       retries: 5
     volumes:
       - ${DATA_DIR}/grafana:/var/lib/grafana:rw
-      - ./grafana/provisioning/:/etc/grafana/provisioning/
+      - ./grafana/provisioning/:/etc/grafana/provisioning:rw
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini
       - ./grafana/ldap.toml:/etc/grafana/ldap.toml
     env_file:
