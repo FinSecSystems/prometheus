@@ -7,7 +7,8 @@ services:
     container_name: prometheus-app
     dns: ${DNS_IP_INTERNAL}
     external_links:
-      - operations-dns
+      - operations:dns
+      - logs:fluentd
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-app:9090"]
       interval: 60s
@@ -24,7 +25,7 @@ services:
       - '--web.console.templates=/usr/share/prometheus/consoles'
     depends_on:
       - cadvisor
-    restart: always
+    restart: unless-stopped
     env_file:
       - ./prometheus.env
     networks:
@@ -38,13 +39,16 @@ services:
         fluentd-address: logger.finsec.localdomain:24224
         tag: "{{.Name}}.{{.ID}}"
         fluentd-async: "true"
+        fluentd-max-retries: "144"
+        fluentd-retry-wait: "600s"
 
   node-exporter:
     image: prom/node-exporter
     container_name: prometheus-node-exporter
     dns: ${DNS_IP_INTERNAL}
     external_links:
-      - operations-dns
+      - operations:dns
+      - logs:fluentd
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-node-exporter:9100"]
       interval: 60s
@@ -60,7 +64,7 @@ services:
       - '--path.sysfs=/host/sys'
       - --collector.filesystem.ignored-mount-points
       - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
-    restart: always
+    restart: unless-stopped
     deploy:
       mode: global
     env_file:
@@ -74,13 +78,16 @@ services:
         fluentd-address: logger.finsec.localdomain:24224
         tag: "{{.Name}}.{{.ID}}"
         fluentd-async: "true"
+        fluentd-max-retries: "144"
+        fluentd-retry-wait: "600s"
 
   alertmanager:
     image: prom/alertmanager
     container_name: prometheus-alertmanager
     dns: ${DNS_IP_INTERNAL}
     external_links:
-      - operations-dns
+      - operations:dns
+      - logs:fluentd
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-alertmanager:9093"]
       interval: 60s
@@ -89,7 +96,7 @@ services:
       retries: 5
     volumes:
       - "./alertmanager/:/etc/alertmanager/"
-    restart: always
+    restart: unless-stopped
     command:
       - '--config.file=/etc/alertmanager/config.yml'
       - '--storage.path=/alertmanager'
@@ -105,13 +112,16 @@ services:
         fluentd-address: logger.finsec.localdomain:24224
         tag: "{{.Name}}.{{.ID}}"
         fluentd-async: "true"
+        fluentd-max-retries: "144"
+        fluentd-retry-wait: "600s"
 
   cadvisor:
     image: google/cadvisor
     container_name: prometheus-cadvisor
     dns: ${DNS_IP_INTERNAL}
     external_links:
-      - operations-dns
+      - operations:dns
+      - logs:fluentd
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-cadvisor:8080"]
       interval: 60s
@@ -126,7 +136,7 @@ services:
       - /sys/fs/cgroup:/cgroup:ro
       - /dev/disk/:/dev/disk:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-    restart: always
+    restart: unless-stopped
     devices:
       - /dev/kmsg:/dev/kmsg
     security_opt:
@@ -148,13 +158,16 @@ services:
         fluentd-address: logger.finsec.localdomain:24224
         tag: "{{.Name}}.{{.ID}}"
         fluentd-async: "true"
+        fluentd-max-retries: "144"
+        fluentd-retry-wait: "600s"
 
   grafana:
     image: grafana/grafana
     container_name: prometheus-grafana
     dns: ${DNS_IP_INTERNAL}
     external_links:
-      - operations-dns
+      - operations:dns
+      - logs:fluentd
     depends_on:
       - app
     healthcheck:
@@ -170,7 +183,7 @@ services:
       - ./grafana/ldap.toml:/etc/grafana/ldap.toml
     env_file:
       - ./grafana/config.monitoring
-    restart: always
+    restart: unless-stopped
     env_file:
       - ./prometheus.env
     networks:
@@ -182,16 +195,20 @@ services:
         fluentd-address: logger.finsec.localdomain:24224
         tag: "{{.Name}}.{{.ID}}"
         fluentd-async: "true"
+        fluentd-max-retries: "144"
+        fluentd-retry-wait: "600s"
 
   grafana-proxy-internal:
     image: registry.finsec.localdomain/proxy-nginx
     container_name: prometheus-grafana-proxy-internal
     dns: ${DNS_IP_INTERNAL}
+    restart: unless-stopped
     depends_on:
       - grafana
     external_links:
-      - operations-dns
-      - operations-proxy
+      - operations:dns
+      - logs:fluentd
+      - operations:proxy
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-grafana-proxy-internal"]
       interval: 60s
@@ -215,16 +232,20 @@ services:
         fluentd-address: logger.finsec.localdomain:24224
         tag: "{{.Name}}.{{.ID}}"
         fluentd-async: "true"
+        fluentd-max-retries: "144"
+        fluentd-retry-wait: "600s"
 
   app-proxy-internal:
     image: registry.finsec.localdomain/proxy-nginx
     container_name: prometheus-app-proxy-internal
     dns: ${DNS_IP_INTERNAL}
+    restart: unless-stopped
     depends_on:
       - app
     external_links:
-      - operations-dns
-      - operations-proxy
+      - operations:dns
+      - logs:fluentd
+      - operations:proxy
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-app-proxy-internal"]
       interval: 60s
@@ -247,16 +268,20 @@ services:
         fluentd-address: logger.finsec.localdomain:24224
         tag: "{{.Name}}.{{.ID}}"
         fluentd-async: "true"
+        fluentd-max-retries: "144"
+        fluentd-retry-wait: "600s"
 
   node-stats-proxy-internal:
     image: registry.finsec.localdomain/proxy-nginx
     container_name: prometheus-node-stats-proxy-internal
     dns: ${DNS_IP_INTERNAL}
+    restart: unless-stopped
     depends_on:
       - node-exporter
     external_links:
-      - operations-dns
-      - operations-proxy
+      - operations:dns
+      - logs:fluentd
+      - operations:proxy
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-node-stats-proxy-internal"]
       interval: 60s
@@ -277,16 +302,20 @@ services:
         fluentd-address: logger.finsec.localdomain:24224
         tag: "{{.Name}}.{{.ID}}"
         fluentd-async: "true"
+        fluentd-max-retries: "144"
+        fluentd-retry-wait: "600s"
 
   alertmanager-proxy-internal:
     image: registry.finsec.localdomain/proxy-nginx
     container_name: prometheus-alertmanager-proxy-internal
     dns: ${DNS_IP_INTERNAL}
+    restart: unless-stopped
     depends_on:
       - alertmanager
     external_links:
-      - operations-dns
-      - operations-proxy
+      - operations:dns
+      - logs:fluentd
+      - operations:proxy
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-alertmanager-proxy-internal"]
       interval: 60s
@@ -307,16 +336,20 @@ services:
         fluentd-address: logger.finsec.localdomain:24224
         tag: "{{.Name}}.{{.ID}}"
         fluentd-async: "true"
+        fluentd-max-retries: "144"
+        fluentd-retry-wait: "600s"
 
   cadvisor-proxy-internal:
     image: registry.finsec.localdomain/proxy-nginx
     container_name: prometheus-cadvisor-proxy-internal
     dns: ${DNS_IP_INTERNAL}
+    restart: unless-stopped
     depends_on:
       - cadvisor
     external_links:
-      - operations-dns
-      - operations-proxy
+      - operations:dns
+      - logs:fluentd
+      - operations:proxy
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-cadvisor-proxy-internal/containers/"]
       interval: 60s
@@ -337,13 +370,17 @@ services:
         fluentd-address: logger.finsec.localdomain:24224
         tag: "{{.Name}}.{{.ID}}"
         fluentd-async: "true"
+        fluentd-max-retries: "144"
+        fluentd-retry-wait: "600s"
 
   alertmanager-bot:
     image: metalmatze/alertmanager-bot:0.4.0
     container_name: prometheus-alertmanager-bot
     dns: ${DNS_IP_INTERNAL}
+    restart: unless-stopped
     external_links:
-      - operations-dns
+      - operations:dns
+      - logs:fluentd
     environment:
       ALERTMANAGER_URL: http://prometheus-alertmanager:9093
       BOLT_PATH: /data/bot.db
@@ -362,13 +399,17 @@ services:
         fluentd-address: logger.finsec.localdomain:24224
         tag: "{{.Name}}.{{.ID}}"
         fluentd-async: "true"
+        fluentd-max-retries: "144"
+        fluentd-retry-wait: "600s"
 
   blackbox-exporter:
     image: prom/blackbox-exporter
     container_name: prometheus-blackbox-exporter
     dns: ${DNS_IP_INTERNAL}
+    restart: unless-stopped
     external_links:
-      - operations-dns
+      - operations:dns
+      - logs:fluentd
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-blackbox-exporter:9115"]
       interval: 60s
@@ -381,7 +422,6 @@ services:
       - '--config.file=/config/blackbox.yml'
     depends_on:
       - app
-    restart: always
     env_file:
       - ./prometheus.env
     networks:
@@ -393,16 +433,20 @@ services:
         fluentd-address: logger.finsec.localdomain:24224
         tag: "{{.Name}}.{{.ID}}"
         fluentd-async: "true"
+        fluentd-max-retries: "144"
+        fluentd-retry-wait: "600s"
 
   blackbox-exporter-proxy-internal:
     image: registry.finsec.localdomain/proxy-nginx
     container_name: prometheus-blackbox-exporter-proxy-internal
     dns: ${DNS_IP_INTERNAL}
+    restart: unless-stopped
     depends_on:
       - blackbox-exporter
     external_links:
-      - operations-dns
-      - operations-proxy
+      - operations:dns
+      - logs:fluentd
+      - operations:proxy
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-blackbox-exporter-proxy-internal"]
       interval: 60s
@@ -423,6 +467,8 @@ services:
         fluentd-address: logger.finsec.localdomain:24224
         tag: "{{.Name}}.{{.ID}}"
         fluentd-async: "true"
+        fluentd-max-retries: "144"
+        fluentd-retry-wait: "600s"
 
 networks:
   operations_intranet:
