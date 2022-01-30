@@ -79,7 +79,7 @@ scrape_configs:
         - https://operations.finsec.localdomain
         - https://errors.finsec.localdomain
 #bitwarden          
-        - https://keychain.finsec.localdomain
+#        - https://keychain.finsec.localdomain
 #debug          
         - https://browser.finsec.localdomain
 #directory
