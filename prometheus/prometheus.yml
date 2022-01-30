@@ -124,7 +124,7 @@ scrape_configs:
 #nextcloud          
         - https://clouddb.finsec.localdomain
         - https://cloudb.finsec.localdomain
-        - https://cloudredis.finsec.localdomain
+          #        - https://cloudredis.finsec.localdomain # Requires Authentication1
         - https://cloud.finsec.localdomain
         - https://office.finsec.localdomain
         - https://draw.finsec.localdomain
@@ -145,7 +145,15 @@ scrape_configs:
         - https://rtl.lightning.finsec.localdomain
         - https://backup.dojo.bitcoin.finsec.localdomain
         - https://thunderhub.lightning.finsec.localdomain
-        - https://backup.specter.bitcoin.finsec.localdomain 
+        - https://backup.specter.bitcoin.finsec.localdomain
+#mastodon
+        - https://social.finsec.localdomain
+        - https://socialdb.finsec.localdomain
+          #        - https://socialredis.finsec.localdomain # Requires authentication
+          #        - wss://stream.social.redis.finsec.localdomain
+#vaultwarden
+        - https://vault.finsec.localdomain
+        - https://vaultdb.finsec.localdomain
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
