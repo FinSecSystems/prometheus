@@ -31,7 +31,7 @@ groups:
       description: "{{ $labels.instance }} is under high load."
 
   - alert: high_service_load
-    expr: rate(container_cpu_user_seconds_total[600s]) > 1.5
+    expr: rate(container_cpu_user_seconds_total[600s]) > 1.6
     for: 2m
     labels:
       severity: page 
