@@ -22,7 +22,7 @@ groups:
       description: "{{ $labels.instance }} of has been not returning 200-OK for more than 2 minutes."
 
   - alert: high_machine_load
-    expr: rate(node_load1[600s]) > 0.6
+    expr: rate(node_load1[600s]) > 1.8
     for: 2m
     labels:
       severity: page 
