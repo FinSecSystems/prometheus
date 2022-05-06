@@ -143,7 +143,7 @@ services:
       - no-new-privileges:true
     command:
       - '-allow_dynamic_housekeeping=false'
-      - '-housekeeping_interval=10s'
+      - '-housekeeping_interval=20s'
       - '-docker_only=true'
     deploy:
       mode: global
