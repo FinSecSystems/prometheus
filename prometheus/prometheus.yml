@@ -131,21 +131,21 @@ scrape_configs:
 #openproject
         - https://tasks.finsec.localdomain
 #external
-        - https://explorer.bitcoin.finsec.localdomain
-        - https://ronin.bitcoin.finsec.localdomain          
-        - https://dojo.bitcoin.finsec.localdomain       
-        - https://specter.bitcoin.finsec.localdomain 
+#        - https://explorer.bitcoin.finsec.localdomain
+#        - https://ronin.bitcoin.finsec.localdomain          
+#        - https://dojo.bitcoin.finsec.localdomain       
+#        - https://specter.bitcoin.finsec.localdomain 
 #external(ravage)          
-        - https://umbrel.bitcoin.finsec.localdomain
-        - https://mempool.bitcoin.finsec.localdomain
-        - https://backup.explorer.bitcoin.finsec.localdomain
-        - https://pay.bitcoin.finsec.localdomain
-        - https://terminal.lightning.finsec.localdomain
-        - https://lnbits.lightning.finsec.localdomain
-        - https://rtl.lightning.finsec.localdomain
-        - https://backup.dojo.bitcoin.finsec.localdomain
-        - https://thunderhub.lightning.finsec.localdomain
-        - https://backup.specter.bitcoin.finsec.localdomain
+#        - https://umbrel.bitcoin.finsec.localdomain
+#        - https://mempool.bitcoin.finsec.localdomain
+#        - https://backup.explorer.bitcoin.finsec.localdomain
+#        - https://pay.bitcoin.finsec.localdomain
+#        - https://terminal.lightning.finsec.localdomain
+#        - https://lnbits.lightning.finsec.localdomain
+#        - https://rtl.lightning.finsec.localdomain
+#        - https://backup.dojo.bitcoin.finsec.localdomain
+#        - https://thunderhub.lightning.finsec.localdomain
+#        - https://backup.specter.bitcoin.finsec.localdomain
 #mastodon
         - https://social.finsec.localdomain
         - https://socialdb.finsec.localdomain
