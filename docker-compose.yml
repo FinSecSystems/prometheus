@@ -33,14 +33,14 @@ services:
         ipv4_address: 172.34.7.2
         aliases:
           - prometheus
-    logging:
-      driver: "fluentd"
-      options:
-        fluentd-address: logger.finsec.localdomain:24224
-        tag: "{{.Name}}.{{.ID}}"
-        fluentd-async: "true"
-        fluentd-max-retries: "144"
-        fluentd-retry-wait: "600s"
+    # logging:
+    #   driver: "fluentd"
+    #   options:
+    #     fluentd-address: logger.finsec.localdomain:24224
+    #     tag: "{{.Name}}.{{.ID}}"
+    #     fluentd-async: "true"
+    #     fluentd-max-retries: "144"
+    #     fluentd-retry-wait: "600s"
 
   node-exporter:
     image: prom/node-exporter
@@ -72,14 +72,14 @@ services:
     networks:
       operations_intranet:
         ipv4_address: 172.34.7.3
-    logging:
-      driver: "fluentd"
-      options:
-        fluentd-address: logger.finsec.localdomain:24224
-        tag: "{{.Name}}.{{.ID}}"
-        fluentd-async: "true"
-        fluentd-max-retries: "144"
-        fluentd-retry-wait: "600s"
+    # logging:
+    #   driver: "fluentd"
+    #   options:
+    #     fluentd-address: logger.finsec.localdomain:24224
+    #     tag: "{{.Name}}.{{.ID}}"
+    #     fluentd-async: "true"
+    #     fluentd-max-retries: "144"
+    #     fluentd-retry-wait: "600s"
 
   alertmanager:
     image: prom/alertmanager
@@ -106,14 +106,14 @@ services:
     networks:
       operations_intranet:
         ipv4_address: 172.34.7.4
-    logging:
-      driver: "fluentd"
-      options:
-        fluentd-address: logger.finsec.localdomain:24224
-        tag: "{{.Name}}.{{.ID}}"
-        fluentd-async: "true"
-        fluentd-max-retries: "144"
-        fluentd-retry-wait: "600s"
+    # logging:
+    #   driver: "fluentd"
+    #   options:
+    #     fluentd-address: logger.finsec.localdomain:24224
+    #     tag: "{{.Name}}.{{.ID}}"
+    #     fluentd-async: "true"
+    #     fluentd-max-retries: "144"
+    #     fluentd-retry-wait: "600s"
 
   cadvisor:
     image: google/cadvisor
@@ -152,14 +152,14 @@ services:
     networks:
       operations_intranet:
         ipv4_address: 172.34.7.5
-    logging:
-      driver: "fluentd"
-      options:
-        fluentd-address: logger.finsec.localdomain:24224
-        tag: "{{.Name}}.{{.ID}}"
-        fluentd-async: "true"
-        fluentd-max-retries: "144"
-        fluentd-retry-wait: "600s"
+    # logging:
+    #   driver: "fluentd"
+    #   options:
+    #     fluentd-address: logger.finsec.localdomain:24224
+    #     tag: "{{.Name}}.{{.ID}}"
+    #     fluentd-async: "true"
+    #     fluentd-max-retries: "144"
+    #     fluentd-retry-wait: "600s"
 
   grafana:
     image: grafana/grafana
@@ -189,14 +189,14 @@ services:
     networks:
       operations_intranet:
         ipv4_address: 172.34.7.6
-    logging:
-      driver: "fluentd"
-      options:
-        fluentd-address: logger.finsec.localdomain:24224
-        tag: "{{.Name}}.{{.ID}}"
-        fluentd-async: "true"
-        fluentd-max-retries: "144"
-        fluentd-retry-wait: "600s"
+    # logging:
+    #   driver: "fluentd"
+    #   options:
+    #     fluentd-address: logger.finsec.localdomain:24224
+    #     tag: "{{.Name}}.{{.ID}}"
+    #     fluentd-async: "true"
+    #     fluentd-max-retries: "144"
+    #     fluentd-retry-wait: "600s"
 
   grafana-proxy-internal:
     image: registry.finsec.localdomain/proxy-nginx
@@ -226,14 +226,14 @@ services:
         aliases:
          - monitor.finsec
          - monitor
-    logging:
-      driver: "fluentd"
-      options:
-        fluentd-address: logger.finsec.localdomain:24224
-        tag: "{{.Name}}.{{.ID}}"
-        fluentd-async: "true"
-        fluentd-max-retries: "144"
-        fluentd-retry-wait: "600s"
+    # logging:
+    #   driver: "fluentd"
+    #   options:
+    #     fluentd-address: logger.finsec.localdomain:24224
+    #     tag: "{{.Name}}.{{.ID}}"
+    #     fluentd-async: "true"
+    #     fluentd-max-retries: "144"
+    #     fluentd-retry-wait: "600s"
 
   app-proxy-internal:
     image: registry.finsec.localdomain/proxy-nginx
@@ -262,14 +262,14 @@ services:
         ipv4_address: 172.34.7.8
         aliases:
           - prometheus.finsec
-    logging:
-      driver: "fluentd"
-      options:
-        fluentd-address: logger.finsec.localdomain:24224
-        tag: "{{.Name}}.{{.ID}}"
-        fluentd-async: "true"
-        fluentd-max-retries: "144"
-        fluentd-retry-wait: "600s"
+    # logging:
+    #   driver: "fluentd"
+    #   options:
+    #     fluentd-address: logger.finsec.localdomain:24224
+    #     tag: "{{.Name}}.{{.ID}}"
+    #     fluentd-async: "true"
+    #     fluentd-max-retries: "144"
+    #     fluentd-retry-wait: "600s"
 
   node-stats-proxy-internal:
     image: registry.finsec.localdomain/proxy-nginx
@@ -296,14 +296,14 @@ services:
     networks:
       operations_intranet:
         ipv4_address: 172.34.7.9
-    logging:
-      driver: "fluentd"
-      options:
-        fluentd-address: logger.finsec.localdomain:24224
-        tag: "{{.Name}}.{{.ID}}"
-        fluentd-async: "true"
-        fluentd-max-retries: "144"
-        fluentd-retry-wait: "600s"
+    # logging:
+    #   driver: "fluentd"
+    #   options:
+    #     fluentd-address: logger.finsec.localdomain:24224
+    #     tag: "{{.Name}}.{{.ID}}"
+    #     fluentd-async: "true"
+    #     fluentd-max-retries: "144"
+    #     fluentd-retry-wait: "600s"
 
   alertmanager-proxy-internal:
     image: registry.finsec.localdomain/proxy-nginx
@@ -330,14 +330,14 @@ services:
     networks:
       operations_intranet:
         ipv4_address: 172.34.7.10
-    logging:
-      driver: "fluentd"
-      options:
-        fluentd-address: logger.finsec.localdomain:24224
-        tag: "{{.Name}}.{{.ID}}"
-        fluentd-async: "true"
-        fluentd-max-retries: "144"
-        fluentd-retry-wait: "600s"
+    # logging:
+    #   driver: "fluentd"
+    #   options:
+    #     fluentd-address: logger.finsec.localdomain:24224
+    #     tag: "{{.Name}}.{{.ID}}"
+    #     fluentd-async: "true"
+    #     fluentd-max-retries: "144"
+    #     fluentd-retry-wait: "600s"
 
   cadvisor-proxy-internal:
     image: registry.finsec.localdomain/proxy-nginx
@@ -364,14 +364,14 @@ services:
     networks:
       operations_intranet:
         ipv4_address: 172.34.7.11
-    logging:
-      driver: "fluentd"
-      options:
-        fluentd-address: logger.finsec.localdomain:24224
-        tag: "{{.Name}}.{{.ID}}"
-        fluentd-async: "true"
-        fluentd-max-retries: "144"
-        fluentd-retry-wait: "600s"
+    # logging:
+    #   driver: "fluentd"
+    #   options:
+    #     fluentd-address: logger.finsec.localdomain:24224
+    #     tag: "{{.Name}}.{{.ID}}"
+    #     fluentd-async: "true"
+    #     fluentd-max-retries: "144"
+    #     fluentd-retry-wait: "600s"
 
   alertmanager-bot:
     image: metalmatze/alertmanager-bot:0.4.0
@@ -393,14 +393,14 @@ services:
     networks:
       operations_intranet:
         ipv4_address: 172.34.7.12
-    logging:
-      driver: "fluentd"
-      options:
-        fluentd-address: logger.finsec.localdomain:24224
-        tag: "{{.Name}}.{{.ID}}"
-        fluentd-async: "true"
-        fluentd-max-retries: "144"
-        fluentd-retry-wait: "600s"
+    # logging:
+    #   driver: "fluentd"
+    #   options:
+    #     fluentd-address: logger.finsec.localdomain:24224
+    #     tag: "{{.Name}}.{{.ID}}"
+    #     fluentd-async: "true"
+    #     fluentd-max-retries: "144"
+    #     fluentd-retry-wait: "600s"
 
   blackbox-exporter:
     image: prom/blackbox-exporter
@@ -427,14 +427,14 @@ services:
     networks:
       operations_intranet:
         ipv4_address: 172.34.7.13
-    logging:
-      driver: "fluentd"
-      options:
-        fluentd-address: logger.finsec.localdomain:24224
-        tag: "{{.Name}}.{{.ID}}"
-        fluentd-async: "true"
-        fluentd-max-retries: "144"
-        fluentd-retry-wait: "600s"
+    # logging:
+    #   driver: "fluentd"
+    #   options:
+    #     fluentd-address: logger.finsec.localdomain:24224
+    #     tag: "{{.Name}}.{{.ID}}"
+    #     fluentd-async: "true"
+    #     fluentd-max-retries: "144"
+    #     fluentd-retry-wait: "600s"
 
   blackbox-exporter-proxy-internal:
     image: registry.finsec.localdomain/proxy-nginx
@@ -461,14 +461,14 @@ services:
     networks:
       operations_intranet:
         ipv4_address: 172.34.7.14
-    logging:
-      driver: "fluentd"
-      options:
-        fluentd-address: logger.finsec.localdomain:24224
-        tag: "{{.Name}}.{{.ID}}"
-        fluentd-async: "true"
-        fluentd-max-retries: "144"
-        fluentd-retry-wait: "600s"
+    # logging:
+    #   driver: "fluentd"
+    #   options:
+    #     fluentd-address: logger.finsec.localdomain:24224
+    #     tag: "{{.Name}}.{{.ID}}"
+    #     fluentd-async: "true"
+    #     fluentd-max-retries: "144"
+    #     fluentd-retry-wait: "600s"
 
 networks:
   operations_intranet:

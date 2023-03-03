@@ -154,6 +154,10 @@ scrape_configs:
 #vaultwarden
         - https://vault.finsec.localdomain
         - https://vaultdb.finsec.localdomain
+#mail
+        - https://webmail.finsec.localdomain
+        - https://webmaildb.finsec.localdomain
+
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
