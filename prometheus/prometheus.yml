@@ -168,6 +168,8 @@ scrape_configs:
         - https://prototypedb.finsec.localdomain
 #stash
         - https://stash.finsec.localdomain
+#pdf
+        - https://pdf.finsec.localdomain
 
     relabel_configs:
       - source_labels: [__address__]
