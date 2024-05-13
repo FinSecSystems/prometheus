@@ -170,6 +170,8 @@ scrape_configs:
         - https://stash.finsec.localdomain
 #pdf
         - https://pdf.finsec.localdomain
+#uptime
+        - https://uptime.finsec.localdomain
 
     relabel_configs:
       - source_labels: [__address__]
