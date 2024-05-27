@@ -27,7 +27,6 @@ alerting:
 # Here it's Prometheus itself.
 scrape_configs:
   # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
-
   - job_name: 'prometheus'
 
     # Override the global default and scrape targets from this job every 5 seconds.
@@ -172,6 +171,10 @@ scrape_configs:
         - https://pdf.finsec.localdomain
 #uptime
         - https://uptime.finsec.localdomain
+#audiobooks
+        - https://audiobooks.finsec.localdomain
+#photos
+        - https://photos.finsec.localdomain
 
     relabel_configs:
       - source_labels: [__address__]

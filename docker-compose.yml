@@ -116,7 +116,7 @@ services:
     #     fluentd-retry-wait: "600s"
 
   cadvisor:
-    image: google/cadvisor
+    image: gcr.io/cadvisor/cadvisor
     container_name: prometheus-cadvisor
     dns: ${DNS_IP_INTERNAL}
     external_links:
@@ -385,7 +385,7 @@ services:
       ALERTMANAGER_URL: http://prometheus-alertmanager:9093
       BOLT_PATH: /data/bot.db
       STORE: bolt
-      TEMPLATE_PATHS: /templates/default.tmpl
+      TEMPLATE_PATHS: /data/default.tmpl
     env_file:
       - ./prometheus.env
     volumes:
