@@ -160,8 +160,8 @@ scrape_configs:
 #music
         - https://music.finsec.localdomain
 #books
-        - https://books.finsec.localdomain
-        - https://admin.books.finsec.localdomain
+#        - https://books.finsec.localdomain
+#        - https://admin.books.finsec.localdomain
 #prototype
         - https://prototype.finsec.localdomain
         - https://prototypedb.finsec.localdomain
@@ -175,6 +175,8 @@ scrape_configs:
         - https://audiobooks.finsec.localdomain
 #photos
         - https://photos.finsec.localdomain
+#wazuh
+        - https://security.finsec.localdomain
 
     relabel_configs:
       - source_labels: [__address__]
