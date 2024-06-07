@@ -11,7 +11,7 @@ services:
       - logs:fluentd
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-app:9090"]
-      interval: 60s
+      interval: 300s
       timeout: 120s
       start_period: 100s
       retries: 5
@@ -51,7 +51,7 @@ services:
       - logs:fluentd
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-node-exporter:9100"]
-      interval: 60s
+      interval: 300s
       timeout: 120s
       start_period: 100s
       retries: 5
@@ -90,7 +90,7 @@ services:
       - logs:fluentd
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-alertmanager:9093"]
-      interval: 60s
+      interval: 300s
       timeout: 120s
       start_period: 100s
       retries: 5
@@ -124,7 +124,7 @@ services:
       - logs:fluentd
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-cadvisor:8080"]
-      interval: 60s
+      interval: 300s
       timeout: 120s
       start_period: 100s
       retries: 5
@@ -172,7 +172,7 @@ services:
       - app
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-grafana:3000"]
-      interval: 60s
+      interval: 300s
       timeout: 120s
       start_period: 100s
       retries: 5
@@ -211,7 +211,7 @@ services:
       - operations:proxy
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-grafana-proxy-internal"]
-      interval: 60s
+      interval: 300s
       timeout: 120s
       start_period: 100s
       retries: 5
@@ -248,7 +248,7 @@ services:
       - operations:proxy
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-app-proxy-internal"]
-      interval: 60s
+      interval: 300s
       timeout: 120s
       start_period: 100s
       retries: 5
@@ -284,7 +284,7 @@ services:
       - operations:proxy
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-node-stats-proxy-internal"]
-      interval: 60s
+      interval: 300s
       timeout: 120s
       start_period: 100s
       retries: 5
@@ -318,7 +318,7 @@ services:
       - operations:proxy
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-alertmanager-proxy-internal"]
-      interval: 60s
+      interval: 300s
       timeout: 120s
       start_period: 100s
       retries: 5
@@ -352,7 +352,7 @@ services:
       - operations:proxy
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-cadvisor-proxy-internal/containers/"]
-      interval: 60s
+      interval: 300s
       timeout: 120s
       start_period: 100s
       retries: 5
@@ -412,7 +412,7 @@ services:
       - logs:fluentd
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-blackbox-exporter:9115"]
-      interval: 60s
+      interval: 300s
       timeout: 120s
       start_period: 100s
       retries: 5
@@ -449,7 +449,7 @@ services:
       - operations:proxy
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-blackbox-exporter-proxy-internal"]
-      interval: 60s
+      interval: 300s
       timeout: 120s
       start_period: 100s
       retries: 5
