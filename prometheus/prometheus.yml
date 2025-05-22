@@ -78,8 +78,6 @@ scrape_configs:
         - https://ca.finsec.localdomain
         - https://operations.finsec.localdomain
         - https://errors.finsec.localdomain
-#bitwarden          
-#        - https://keychain.finsec.localdomain
 #debug          
         - https://browser.finsec.localdomain
 #directory
@@ -131,21 +129,39 @@ scrape_configs:
 #openproject
         - https://tasks.finsec.localdomain
 #external
-#        - https://explorer.bitcoin.finsec.localdomain
-#        - https://ronin.bitcoin.finsec.localdomain          
-#        - https://dojo.bitcoin.finsec.localdomain       
-#        - https://specter.bitcoin.finsec.localdomain 
+        - https://raspiblitz.finsec.localdomain
+        - https://mempool.finsec.localdomain
+        - https://electrs.finsec.localdomain
+        - https://btcexplorer.finsec.localdomain
+        - https://btcpay.finsec.localdomain
+        - https://joinmarket.finsec.localdomain
+        - https://rtl.finsec.localdomain
+        - https://lnbits.finsec.localdomain
+
 #external(ravage)          
-#        - https://umbrel.bitcoin.finsec.localdomain
-#        - https://mempool.bitcoin.finsec.localdomain
-#        - https://backup.explorer.bitcoin.finsec.localdomain
-#        - https://pay.bitcoin.finsec.localdomain
-#        - https://terminal.lightning.finsec.localdomain
-#        - https://lnbits.lightning.finsec.localdomain
-#        - https://rtl.lightning.finsec.localdomain
-#        - https://backup.dojo.bitcoin.finsec.localdomain
-#        - https://thunderhub.lightning.finsec.localdomain
-#        - https://backup.specter.bitcoin.finsec.localdomain
+        # - https://raspiblitz.ravage.finsec.localdomain
+        # - https://mempool.ravage.finsec.localdomain
+        # - https://electrs.ravage.finsec.localdomain
+        # - https://btcexplorer.ravage.finsec.localdomain
+        # - https://btcpay.ravage.finsec.localdomain
+        # - https://joinmarket.ravage.finsec.localdomain
+        # - https://rtl.ravage.finsec.localdomain
+        # - https://lnbits.ravage.finsec.localdomain
+        # - https://alby.finsec.localdomain
+        # - https://thunderhub.finsec.localdomain
+        # - https://lit.finsec.localdomain
+
+#external(lazerbeak)
+        - https://raspiblitz.lazerbeak.finsec.localdomain
+        - https://mempool.lazerbeak.finsec.localdomain
+        - https://electrs.lazerbeak.finsec.localdomain        
+        - https://btcexplorer.lazerbeak.finsec.localdomain
+        - https://btcpay.lazerbeak.finsec.localdomain
+        - https://joinmarket.lazerbeak.finsec.localdomain
+        - https://rtl.lazerbeak.finsec.localdomain
+        - https://lnbits.lazerbeak.finsec.localdomain
+
+
 #mastodon
           #- https://social.finsec.localdomain
           #- https://socialdb.finsec.localdomain
@@ -159,10 +175,10 @@ scrape_configs:
         - https://webmaildb.finsec.localdomain
 #music
         - https://music.finsec.localdomain
-#books
+#calibre
 #        - https://books.finsec.localdomain
 #        - https://admin.books.finsec.localdomain
-#prototype
+#penpot
         - https://prototype.finsec.localdomain
         - https://prototypedb.finsec.localdomain
 #stash
@@ -177,6 +193,20 @@ scrape_configs:
         - https://photos.finsec.localdomain
 #wazuh
         - https://security.finsec.localdomain
+#code
+        - https://code.finsec.localdomain        
+#paperless
+        - https://docs.finsec.localdomain        
+#menu
+        - https://finsec.localdomain
+#websites
+        - landing.liquibrium.finsec.localdomain
+        - liquibrium.finsec.localdomain
+        - auth.exchange.liquibrium.finsec.localdomain
+        - api.exchange.liquibrium.finsec.localdomain
+        - db.exchange.liquibrium.finsec.localdomain
+        - exchange.liquibrium.finsec.localdomain
+        - admin.exchange.liquibrium.finsec.localdomain
 
     relabel_configs:
       - source_labels: [__address__]
