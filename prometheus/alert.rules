@@ -2,15 +2,15 @@ groups:
 - name: finsec.localdomain
   rules:
 
-  # Alert for any instance that is unreachable for >5 minutes.
+  # Alert for any instance that is unreachable for >10 minutes.
   - alert: service_down
     expr: up == 0
-    for: 5m
+    for: 10m
     labels:
       severity: page
     annotations:
       summary: "{{ $labels.instance }} down"
-      description: "{{ $labels.instance }} has been down for more than 2 minutes."
+      description: "{{ $labels.instance }} has been down for more than 10 minutes."
 
   - alert: http_service_down
     expr: probe_http_status_code != 200 and probe_http_status_code != 0

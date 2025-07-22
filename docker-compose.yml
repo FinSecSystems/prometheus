@@ -133,7 +133,9 @@ services:
       - /var/lib/docker/:/var/lib/docker:ro
       - /sys/fs/cgroup:/cgroup:ro
       - /dev/disk/:/dev/disk:ro
+      - /var/lib/dbus/machine-id:/var/lib/dbus/machine-id:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/machine-id:/etc/machine-id:ro
     restart: ${RESTART}
     devices:
       - /dev/kmsg:/dev/kmsg
@@ -146,6 +148,10 @@ services:
       - '--disable_metrics=disk,memory_numa,referenced_memory'
     deploy:
       mode: global
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "256M"      
     env_file:
       - ./prometheus.env
     networks:
@@ -481,7 +487,7 @@ services:
       - operations:dns
       - logs:fluentd
     healthcheck:
-      test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-influxdb:8086/health"]
+      test: ["CMD", "curl", "-f", "http://prometheus-influxdb:8086/health || exit 1"]
       interval: 300s
       timeout: 120s
       start_period: 100s
@@ -506,7 +512,7 @@ services:
       - logs:fluentd
       - operations:proxy
     healthcheck:
-      test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-influxdb:8086/health"]
+      test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-influxdb:8086/health || exit 1"]
       interval: 300s
       timeout: 120s
       start_period: 100s

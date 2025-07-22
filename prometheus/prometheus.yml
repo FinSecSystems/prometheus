@@ -136,7 +136,7 @@ scrape_configs:
         - https://btcpay.finsec.localdomain
         - https://joinmarket.finsec.localdomain
         - https://rtl.finsec.localdomain
-        - https://lnbits.finsec.localdomain
+#        - https://lnbits.finsec.localdomain
 
 #external(ravage)          
         # - https://raspiblitz.ravage.finsec.localdomain
@@ -159,7 +159,7 @@ scrape_configs:
         - https://btcpay.lazerbeak.finsec.localdomain
         - https://joinmarket.lazerbeak.finsec.localdomain
         - https://rtl.lazerbeak.finsec.localdomain
-        - https://lnbits.lazerbeak.finsec.localdomain
+#        - https://lnbits.lazerbeak.finsec.localdomain
 
 
 #mastodon
@@ -202,8 +202,8 @@ scrape_configs:
 #websites
         - landing.liquibrium.finsec.localdomain
         - liquibrium.finsec.localdomain
-        - auth.exchange.liquibrium.finsec.localdomain
-        - api.exchange.liquibrium.finsec.localdomain
+#        - auth.exchange.liquibrium.finsec.localdomain
+#        - api.exchange.liquibrium.finsec.localdomain
         - db.exchange.liquibrium.finsec.localdomain
         - exchange.liquibrium.finsec.localdomain
         - admin.exchange.liquibrium.finsec.localdomain
