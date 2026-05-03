@@ -93,8 +93,8 @@ scrape_configs:
         - https://diagram.finsec.localdomain
           #        - https://projects.finsec.localdomain TBD
 #helpdesk
-        - https://helpdesk.finsec.localdomain
-        - https://helpdeskdb.finsec.localdomain
+#        - https://helpdesk.finsec.localdomain
+#        - https://helpdeskdb.finsec.localdomain
 #firefox
         - https://sync.finsec.localdomain
 #limesurvey          
@@ -191,6 +191,7 @@ scrape_configs:
         - https://audiobooks.finsec.localdomain
 #photos
         - https://photos.finsec.localdomain
+        - https://pictures.finsec.localdomain
 #wazuh
         - https://security.finsec.localdomain
 #code
