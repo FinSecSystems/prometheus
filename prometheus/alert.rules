@@ -5,12 +5,12 @@ groups:
   # Alert for any instance that is unreachable for >10 minutes.
   - alert: service_down
     expr: up == 0
-    for: 10m
+    for: 30m
     labels:
       severity: page
     annotations:
       summary: "{{ $labels.instance }} down"
-      description: "{{ $labels.instance }} has been down for more than 10 minutes."
+      description: "{{ $labels.instance }} has been down for more than 30 minutes."
 
   - alert: http_service_down
     expr: probe_http_status_code != 200 and probe_http_status_code != 0
@@ -19,11 +19,11 @@ groups:
       severity: page
     annotations:
       summary: "{{ $labels.instance }} HTTP Status is not OK"
-      description: "{{ $labels.instance }} of has been not returning 200-OK for more than 2 minutes."
+      description: "{{ $labels.instance }} of has been not returning 200-OK for more than 5 minutes."
 
   - alert: high_machine_load
     expr: rate(node_load1[600s]) > 1.8
-    for: 2m
+    for: 10m
     labels:
       severity: page 
     annotations:

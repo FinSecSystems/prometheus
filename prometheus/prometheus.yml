@@ -118,7 +118,7 @@ scrape_configs:
         - https://prometheus.finsec.localdomain
         - https://node-stats.finsec.localdomain
         - https://alertmanager.finsec.localdomain
-        - https://cadvisor.finsec.localdomain
+#        - https://cadvisor.finsec.localdomain
 #nextcloud          
         - https://clouddb.finsec.localdomain
         - https://cloudb.finsec.localdomain
