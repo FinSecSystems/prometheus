@@ -534,6 +534,39 @@ services:
     #     fluentd-max-retries: "144"
     #     fluentd-retry-wait: "600s"
 
+  diun:
+    image: crazymax/diun@sha256:e324b793eb32dfb7f74d3a39421ebf090141caaadee69b8f78da63112408ee25  # v4.33.0
+    container_name: prometheus-diun
+    dns: ${DNS_IP_INTERNAL}
+    external_links:
+      - operations:dns
+      - logs:fluentd
+    healthcheck:
+      test: ["CMD", "diun", "--version"]
+      interval: 300s
+      timeout: 120s
+      start_period: 100s
+      retries: 5
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${NR_DATA_DIR}/diun:/data
+      - ./diun/notify.sh:/notify.sh:ro
+    restart: ${RESTART}
+    env_file:
+      - ./diun.env
+    depends_on:
+      - alertmanager
+    networks:
+      operations_intranet:
+        ipv4_address: 172.34.7.17
+    # logging:
+    #   driver: "fluentd"
+    #   options:
+    #     fluentd-address: logger.finsec.localdomain:24224
+    #     tag: "{{.Name}}.{{.ID}}"
+    #     fluentd-async: "true"
+    #     fluentd-max-retries: "144"
+    #     fluentd-retry-wait: "600s"
 
 
 networks:
