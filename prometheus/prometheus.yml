@@ -194,6 +194,8 @@ scrape_configs:
         - https://pictures.finsec.localdomain
 #wazuh
         - https://security.finsec.localdomain
+#defectdojo
+        - https://dojo.finsec.localdomain
 #code
         - https://code.finsec.localdomain        
 #paperless
