@@ -1,7 +1,7 @@
 services:
 
   app:
-    image: prom/prometheus
+    image: prom/prometheus@sha256:e2b8aa62b64855956e3ec1e18b4f9387fb6203174a4471936f4662f437f04405  # pinned digest (was untagged; version unknown, 2026-10-18)
     container_name: prometheus-app
     dns: ${DNS_IP_INTERNAL}
     external_links:
@@ -41,7 +41,7 @@ services:
     #     fluentd-retry-wait: "600s"
 
   node-exporter:
-    image: prom/node-exporter
+    image: prom/node-exporter@sha256:d00a542e409ee618a4edc67da14dd48c5da66726bbd5537ab2af9c1dfc442c8a  # pinned digest (was untagged; version unknown, 2026-10-18)
     container_name: prometheus-node-exporter
     dns: ${DNS_IP_INTERNAL}
     external_links:
@@ -80,7 +80,7 @@ services:
     #     fluentd-retry-wait: "600s"
 
   alertmanager:
-    image: prom/alertmanager
+    image: prom/alertmanager@sha256:27c475db5fb156cab31d5c18a4251ac7ed567746a2483ff264516437a39b15ba  # pinned digest (was untagged; version unknown, 2026-10-18)
     container_name: prometheus-alertmanager
     dns: ${DNS_IP_INTERNAL}
     external_links:
@@ -114,7 +114,7 @@ services:
     #     fluentd-retry-wait: "600s"
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor
+    image: gcr.io/cadvisor/cadvisor@sha256:3cde6faf0791ebf7b41d6f8ae7145466fed712ea6f252c935294d2608b1af388  # pinned digest (was untagged; version unknown, 2026-10-18)
     container_name: prometheus-cadvisor
     dns: ${DNS_IP_INTERNAL}
     external_links:
@@ -167,7 +167,7 @@ services:
     #     fluentd-retry-wait: "600s"
 
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana@sha256:52c3e20686b860c6dc1f623811565773cf51eefa378817a4896dfc863c3c82c8  # pinned digest (was untagged; version unknown, 2026-10-18)
     container_name: prometheus-grafana
     dns: ${DNS_IP_INTERNAL}
     external_links:
@@ -407,7 +407,7 @@ services:
     #     fluentd-retry-wait: "600s"
 
   blackbox-exporter:
-    image: prom/blackbox-exporter
+    image: prom/blackbox-exporter@sha256:92e05d5fe0df01d3980518dc42f07b778a8997048b57392ebc7f7391ebd7bb06  # pinned digest (was untagged; version unknown, 2026-10-18)
     container_name: prometheus-blackbox-exporter
     dns: ${DNS_IP_INTERNAL}
     restart: ${RESTART}
