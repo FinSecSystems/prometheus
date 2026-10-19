@@ -157,7 +157,7 @@ services:
       resources:
         limits:
           cpus: "0.5"
-          memory: "2G"      
+          memory: "1G"      
     env_file:
       - ./prometheus.env
     networks:
