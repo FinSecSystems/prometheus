@@ -98,3 +98,31 @@ groups:
     annotations:
       summary: "Timeshift backup monitoring is not reporting"
       description: "timeshift.prom has not been updated for over an hour: check the cron job scripts/timeshift-metrics.sh and the node-exporter textfile mount."
+
+  # Database dumps for Timeshift (scripts/db-dump.sh, ubuntu cron 00:30 daily, dumps in /home/ubuntu/db-dumps; metrics via the textfile collector)
+  - alert: db_dump_failed
+    expr: db_dump_last_run_failed == 1
+    for: 30m
+    labels:
+      severity: page
+    annotations:
+      summary: "Database dump of {{ $labels.container }} failed"
+      description: "The latest dump of {{ $labels.container }} failed; the previous dump is still in /home/ubuntu/db-dumps. See /home/ubuntu/db-dumps/db-dump.log."
+
+  - alert: db_dump_stale
+    expr: time() - db_dump_last_success_timestamp_seconds > 36 * 3600
+    for: 30m
+    labels:
+      severity: page
+    annotations:
+      summary: "No database dump of {{ $labels.container }} for more than 36 hours"
+      description: "The last successful dump of {{ $labels.container }} is older than 36 hours (it runs daily at 00:30), so the Timeshift snapshot has no fresh copy."
+
+  - alert: db_dump_metrics_missing
+    expr: time() - db_dump_metrics_updated_timestamp_seconds > 36 * 3600 or absent(db_dump_metrics_updated_timestamp_seconds)
+    for: 30m
+    labels:
+      severity: page
+    annotations:
+      summary: "Database dump monitoring is not reporting"
+      description: "db_dump.prom has not been updated for 36 hours: check the cron job scripts/db-dump.sh and the node-exporter textfile mount."
