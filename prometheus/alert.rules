@@ -99,6 +99,34 @@ groups:
       summary: "Timeshift backup monitoring is not reporting"
       description: "timeshift.prom has not been updated for over an hour: check the cron job scripts/timeshift-metrics.sh and the node-exporter textfile mount."
 
+  # Memory pressure and crash loops. Background: cAdvisor sat at its memory limit and was OOM-killed ~35,000 times while swapping 22 MB/s
+  # to the NVMe mirror for months, and nothing noticed (see devops issue #39). Normal swap-out here is ~0 MB/s.
+  - alert: swap_thrashing
+    expr: rate(node_vmstat_pswpout[10m]) * 4096 > 5e6
+    for: 30m
+    labels:
+      severity: page
+    annotations:
+      summary: "{{ $labels.instance }} is swapping out {{ $value | humanize }}B/s for 30 minutes"
+      description: "Sustained swap-out above 5 MB/s wears the NVMe drives (22 MB/s is about 2 TB/day). Find the container that is at its memory limit or the process that is growing: 'docker stats', the kernel log (journalctl -k | grep -i oom) and /sys/fs/cgroup/system.slice/docker-*.scope/memory.swap.current."
+
+  - alert: oom_kills_detected
+    expr: increase(node_vmstat_oom_kill[30m]) > 0
+    labels:
+      severity: page
+    annotations:
+      summary: "{{ $value | humanize }} process(es) OOM-killed on {{ $labels.instance }} in the last 30 minutes"
+      description: "The kernel killed a process for lack of memory (a container hitting its limit, or the host). Run journalctl -k and grep for oom-kill or Killed process to see the container (oom_memcg) and the process."
+
+  - alert: container_restart_loop
+    # container_start_time_seconds is the creation time and never changes on a restart; the CPU counter resets with every new cgroup
+    expr: resets(container_cpu_usage_seconds_total{name!=""}[1h]) > 3
+    labels:
+      severity: page
+    annotations:
+      summary: "Container {{ $labels.name }} restarted about {{ $value }} times in the last hour"
+      description: "{{ $labels.name }} keeps restarting (restart policy loop, e.g. OOM kills or a crash on start). Look at docker logs and docker inspect of this container, and the kernel log for OOM kills. A normal redeploy counts once."
+
   # Database dumps for Timeshift (scripts/db-dump.sh, ubuntu cron 00:30 daily, dumps in /home/ubuntu/db-dumps; metrics via the textfile collector)
   - alert: db_dump_failed
     expr: db_dump_last_run_failed == 1
