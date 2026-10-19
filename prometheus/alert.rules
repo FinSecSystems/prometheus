@@ -48,6 +48,28 @@ groups:
       summary: "{{ $labels.instance }} has < 10% disk space left"
       description: "{{ $labels.instance }} is low on disk space."
 
+  # Linux software RAID (host mdraid, node-exporter md collector). Mail from mdadm --monitor is a second, independent path.
+  - alert: mdraid_degraded
+    expr: >
+      node_md_disks{state="failed"} > 0
+      or (node_md_disks_required - ignoring(state) node_md_disks{state="active"}) > 0
+      or node_md_state{state="inactive"} == 1
+    for: 5m
+    labels:
+      severity: page
+    annotations:
+      summary: "RAID array {{ $labels.device }} on {{ $labels.instance }} is degraded"
+      description: "{{ $labels.device }} has a failed or missing member, or is inactive. Check /proc/mdstat and 'mdadm --detail /dev/{{ $labels.device }}'."
+
+  - alert: mdraid_metrics_missing
+    expr: absent(node_md_disks_required)
+    for: 30m
+    labels:
+      severity: page
+    annotations:
+      summary: "RAID monitoring is not reporting"
+      description: "No node_md_* metrics for 30 minutes: check prometheus-node-exporter and its scrape job, or the array is gone."
+
 
   # Timeshift backups (host, root cron 01:00 daily; metrics from scripts/timeshift-metrics.sh every 15 min via the node-exporter textfile collector)
   - alert: timeshift_backup_failed
