@@ -57,9 +57,11 @@ services:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /:/rootfs:ro
+      - ${NR_DATA_DIR}/textfile:/textfile:ro   # *.prom written by host scripts, e.g. scripts/timeshift-metrics.sh
     command: 
       - '--path.procfs=/host/proc' 
       - '--path.sysfs=/host/sys'
+      - '--collector.textfile.directory=/textfile'
       - --collector.filesystem.ignored-mount-points
       - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
     restart: ${RESTART}
@@ -145,13 +147,17 @@ services:
       - '-allow_dynamic_housekeeping=false'
       - '-housekeeping_interval=20s'
       - '-docker_only=true'
-      - '--disable_metrics=disk,memory_numa,referenced_memory'
+      - '--disable_metrics=disk,diskIO,memory_numa,referenced_memory,percpu,sched,process,tcp,udp,advtcp,hugetlb,cpu_topology,resctrl'
+      - '-store_container_labels=false'
+      - '-whitelisted_container_labels=com.docker.compose.project,com.docker.compose.service'
+      - '-event_storage_age_limit=default=0'
+      - '-event_storage_event_limit=default=0'
     deploy:
       mode: global
       resources:
         limits:
           cpus: "0.5"
-          memory: "512M"      
+          memory: "2G"      
     env_file:
       - ./prometheus.env
     networks:

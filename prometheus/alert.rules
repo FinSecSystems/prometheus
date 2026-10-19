@@ -48,3 +48,31 @@ groups:
       summary: "{{ $labels.instance }} has < 10% disk space left"
       description: "{{ $labels.instance }} is low on disk space."
 
+
+  # Timeshift backups (host, root cron 01:00 daily; metrics from scripts/timeshift-metrics.sh every 15 min via the node-exporter textfile collector)
+  - alert: timeshift_backup_failed
+    expr: timeshift_last_run_failed == 1
+    for: 30m
+    labels:
+      severity: page
+    annotations:
+      summary: "Timeshift backup failed on {{ $labels.instance }}"
+      description: "The newest Timeshift run did not finish with 'Snapshot saved successfully' (see /var/log/timeshift)."
+
+  - alert: timeshift_backup_stale
+    expr: time() - timeshift_last_snapshot_timestamp_seconds > 36 * 3600
+    for: 30m
+    labels:
+      severity: page
+    annotations:
+      summary: "No Timeshift snapshot for more than 36 hours on {{ $labels.instance }}"
+      description: "The last Timeshift snapshot is older than 36 hours (the backup runs daily at 01:00)."
+
+  - alert: timeshift_metrics_missing
+    expr: time() - timeshift_metrics_updated_timestamp_seconds > 3600 or absent(timeshift_metrics_updated_timestamp_seconds)
+    for: 15m
+    labels:
+      severity: page
+    annotations:
+      summary: "Timeshift backup monitoring is not reporting"
+      description: "timeshift.prom has not been updated for over an hour: check the cron job scripts/timeshift-metrics.sh and the node-exporter textfile mount."
