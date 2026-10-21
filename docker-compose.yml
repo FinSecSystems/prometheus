@@ -493,7 +493,7 @@ services:
       - operations:dns
       - logs:fluentd
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://prometheus-influxdb:8086/health || exit 1"]
+      test: ["CMD-SHELL", "curl -sf http://127.0.0.1:8086/health >/dev/null"]
       interval: 300s
       timeout: 120s
       start_period: 100s
@@ -518,7 +518,7 @@ services:
       - logs:fluentd
       - operations:proxy
     healthcheck:
-      test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-influxdb:8086/health || exit 1"]
+      test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://127.0.0.1/health"]
       interval: 300s
       timeout: 120s
       start_period: 100s
