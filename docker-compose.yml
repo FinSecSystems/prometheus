@@ -6,7 +6,6 @@ services:
     dns: ${DNS_IP_INTERNAL}
     external_links:
       - operations:dns
-      - logs:fluentd
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-app:9090"]
       interval: 300s
@@ -38,7 +37,6 @@ services:
     dns: ${DNS_IP_INTERNAL}
     external_links:
       - operations:dns
-      - logs:fluentd
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-node-exporter:9100"]
       interval: 300s
@@ -71,7 +69,6 @@ services:
     dns: ${DNS_IP_INTERNAL}
     external_links:
       - operations:dns
-      - logs:fluentd
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-alertmanager:9093"]
       interval: 300s
@@ -97,7 +94,6 @@ services:
     dns: ${DNS_IP_INTERNAL}
     external_links:
       - operations:dns
-      - logs:fluentd
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-cadvisor:8080"]
       interval: 300s
@@ -146,7 +142,6 @@ services:
     dns: ${DNS_IP_INTERNAL}
     external_links:
       - operations:dns
-      - logs:fluentd
     depends_on:
       - app
     healthcheck:
@@ -177,7 +172,6 @@ services:
       - grafana
     external_links:
       - operations:dns
-      - logs:fluentd
       - operations:proxy
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-grafana-proxy-internal"]
@@ -206,7 +200,6 @@ services:
       - app
     external_links:
       - operations:dns
-      - logs:fluentd
       - operations:proxy
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-app-proxy-internal"]
@@ -234,7 +227,6 @@ services:
       - node-exporter
     external_links:
       - operations:dns
-      - logs:fluentd
       - operations:proxy
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-node-stats-proxy-internal"]
@@ -260,7 +252,6 @@ services:
       - alertmanager
     external_links:
       - operations:dns
-      - logs:fluentd
       - operations:proxy
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-alertmanager-proxy-internal"]
@@ -286,7 +277,6 @@ services:
       - cadvisor
     external_links:
       - operations:dns
-      - logs:fluentd
       - operations:proxy
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-cadvisor-proxy-internal/containers/"]
@@ -310,7 +300,6 @@ services:
     restart: ${RESTART}
     external_links:
       - operations:dns
-      - logs:fluentd
     environment:
       ALERTMANAGER_URL: http://prometheus-alertmanager:9093
       BOLT_PATH: /data/bot.db
@@ -331,7 +320,6 @@ services:
     restart: ${RESTART}
     external_links:
       - operations:dns
-      - logs:fluentd
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-blackbox-exporter:9115"]
       interval: 300s
@@ -359,7 +347,6 @@ services:
       - blackbox-exporter
     external_links:
       - operations:dns
-      - logs:fluentd
       - operations:proxy
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-blackbox-exporter-proxy-internal"]
@@ -387,7 +374,6 @@ services:
     restart: ${RESTART}
     external_links:
       - operations:dns
-      - logs:fluentd
     healthcheck:
       test: ["CMD-SHELL", "curl -sf http://127.0.0.1:8086/health >/dev/null"]
       interval: 300s
@@ -411,7 +397,6 @@ services:
       - influxdb
     external_links:
       - operations:dns
-      - logs:fluentd
       - operations:proxy
     healthcheck:
       test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://127.0.0.1/health"]
@@ -434,7 +419,6 @@ services:
     dns: ${DNS_IP_INTERNAL}
     external_links:
       - operations:dns
-      - logs:fluentd
     healthcheck:
       test: ["CMD", "diun", "--version"]
       interval: 300s
