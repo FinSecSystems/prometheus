@@ -78,6 +78,7 @@ scrape_configs:
         - https://ca.finsec.localdomain
         - https://operations.finsec.localdomain
         - https://errors.finsec.localdomain
+        - https://trust.finsec.localdomain
 #debug          
         - https://browser.finsec.localdomain
 #directory
