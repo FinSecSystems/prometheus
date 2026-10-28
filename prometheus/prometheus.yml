@@ -214,6 +214,7 @@ scrape_configs:
         - https://ops1.liquibrium.localdomain
         - https://gateway.liquibrium.localdomain
         - https://ca.liquibrium.localdomain
+        - https://ops1.liquibrium.com   # through the Cloudflare tunnel: down means tunnel, Cloudflare or gateway-proxy
 
     relabel_configs:
       - source_labels: [__address__]
