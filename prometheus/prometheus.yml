@@ -212,6 +212,9 @@ scrape_configs:
         - https://gateway.liquibrium.localdomain
         - https://ca.liquibrium.localdomain
         - https://ops1.liquibrium.com   # through the Cloudflare tunnel: down means tunnel, Cloudflare or gateway-proxy
+        - https://liquibrium.com
+        - https://exchange.liquibrium.com   # public exchange: login page
+        - https://tracking.liquibrium.com/matomo.js
 
     relabel_configs:
       - source_labels: [__address__]
