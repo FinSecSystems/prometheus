@@ -210,6 +210,10 @@ scrape_configs:
         - db.exchange.liquibrium.finsec.localdomain
         - exchange.liquibrium.finsec.localdomain
         - admin.exchange.liquibrium.finsec.localdomain
+#liquibrium gateway (liquibrium.localdomain)
+        - https://ops1.liquibrium.localdomain
+        - https://gateway.liquibrium.localdomain
+        - https://ca.liquibrium.localdomain
 
     relabel_configs:
       - source_labels: [__address__]
