@@ -202,14 +202,11 @@ scrape_configs:
         - https://docs.finsec.localdomain        
 #menu
         - https://finsec.localdomain
-#websites
-        - landing.liquibrium.finsec.localdomain
-        - liquibrium.finsec.localdomain
-#        - auth.exchange.liquibrium.finsec.localdomain
-#        - api.exchange.liquibrium.finsec.localdomain
-        - db.exchange.liquibrium.finsec.localdomain
-        - exchange.liquibrium.finsec.localdomain
-        - admin.exchange.liquibrium.finsec.localdomain
+#websites (stack moved to liquibrium.localdomain on 2026-10-28)
+        - https://liquibrium.localdomain
+        - https://exchange.liquibrium.localdomain
+        - https://db.exchange.liquibrium.localdomain
+        - https://admin.exchange.liquibrium.localdomain
 #liquibrium gateway (liquibrium.localdomain)
         - https://ops1.liquibrium.localdomain
         - https://gateway.liquibrium.localdomain
