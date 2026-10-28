@@ -211,6 +211,7 @@ scrape_configs:
         - https://ops1.liquibrium.localdomain
         - https://gateway.liquibrium.localdomain
         - https://ca.liquibrium.localdomain
+        - https://trust.liquibrium.localdomain
         - https://ops1.liquibrium.com   # through the Cloudflare tunnel: down means tunnel, Cloudflare or gateway-proxy
         - https://liquibrium.com
         - https://exchange.liquibrium.com   # public exchange: login page
