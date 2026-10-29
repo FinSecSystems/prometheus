@@ -330,6 +330,7 @@ services:
       - ./blackbox-exporter:/config
     command:
       - '--config.file=/config/blackbox.yml'
+      - '--log.level=warn'   # info logs every probe (was 675 MB of json-file log, #61)
     depends_on:
       - app
     env_file:
