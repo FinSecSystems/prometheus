@@ -205,6 +205,7 @@ scrape_configs:
         - https://apps.finsec.localdomain
 #websites
         - https://finsec.localdomain
+        - https://finsec.systems   # public name through the Cloudflare tunnel (was GitHub Pages until the DNS cutover)
 #websites (stack moved to liquibrium.localdomain on 2026-10-28)
         - https://liquibrium.localdomain
         - https://exchange.liquibrium.localdomain
