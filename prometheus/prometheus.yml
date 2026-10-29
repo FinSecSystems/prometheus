@@ -202,6 +202,8 @@ scrape_configs:
 #paperless
         - https://docs.finsec.localdomain        
 #menu
+        - https://apps.finsec.localdomain
+#websites
         - https://finsec.localdomain
 #websites (stack moved to liquibrium.localdomain on 2026-10-28)
         - https://liquibrium.localdomain
