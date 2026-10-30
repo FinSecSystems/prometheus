@@ -31,13 +31,14 @@ groups:
       description: "{{ $labels.instance }} is under high load."
 
   - alert: high_service_load
-    expr: rate(container_cpu_user_seconds_total[600s]) > 2.1
+    # per container (name!=""): the unfiltered series include the root cgroup id="/" (the whole host) and the systemd slices, which fired this alert for ordinary host work (builds, dumps, upgrades); the host as a whole is covered by high_machine_load
+    expr: sum by (instance, name) (rate(container_cpu_user_seconds_total{name!=""}[600s])) > 2.1
     for: 5m
     labels:
       severity: page 
     annotations:
-      summary: "{{ $labels.container_label_com_docker_swarm_service_name }} {{ $labels.instance }} under high load"
-      description: "{{ $labels.instance }} is under high load. taks id is {{ $labels.id }}. container {{ $labels.container_label_com_docker_swarm_service_name }} of stack {{ $labels.container_label_com_docker_stack_namespace }}. Fullname is {{ $labels.name }}"
+      summary: "Container {{ $labels.name }} under high CPU load"
+      description: "Container {{ $labels.name }} ({{ $labels.instance }}) has used more than 2.1 CPU cores (user time) for 15 minutes: {{ $value | printf \"%.1f\" }} cores. Look at docker stats and docker top {{ $labels.name }}."
 
   - alert: low_disk_space
     expr: node_filesystem_free_bytes/node_filesystem_size_bytes*100 < 10
