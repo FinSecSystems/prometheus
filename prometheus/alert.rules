@@ -100,6 +100,25 @@ groups:
       summary: "Timeshift backup monitoring is not reporting"
       description: "timeshift.prom has not been updated for over an hour: check the cron job scripts/timeshift-metrics.sh and the node-exporter textfile mount."
 
+  # Bookmark downloads (stash/bookmark-dl/run.sh, daily 02:30; metrics via the node-exporter textfile collector, docs/stash.md)
+  - alert: bookmark_download_stale
+    expr: time() - bookmark_dl_last_run_timestamp_seconds > 36 * 3600 or absent(bookmark_dl_last_run_timestamp_seconds)
+    for: 1h
+    labels:
+      severity: warning
+    annotations:
+      summary: "The daily bookmark download has not run for 36 hours"
+      description: "Check the cron job and $DATA_DIR/stash/config/bookmark-dl/run.log (stash-app must be running, nextcloud-db must answer)."
+
+  - alert: bookmark_download_site_failing
+    expr: bookmark_dl_host_failures >= 5
+    for: 1d
+    labels:
+      severity: warning
+    annotations:
+      summary: "Downloads from {{ $labels.host }} keep failing ({{ $value }} URLs)"
+      description: "yt-dlp cannot fetch {{ $value }} bookmarked URLs from {{ $labels.host }}: the extractor may be broken (rebuild stash with a newer yt-dlp), the site blocks this host (proxy), or the links are dead. See state.json in $DATA_DIR/stash/config/bookmark-dl."
+
   # Memory pressure and crash loops. Background: cAdvisor sat at its memory limit and was OOM-killed ~35,000 times while swapping 22 MB/s
   # to the NVMe mirror for months, and nothing noticed (see devops issue #39). Normal swap-out here is ~0 MB/s.
   - alert: swap_thrashing
