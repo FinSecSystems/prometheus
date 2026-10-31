@@ -198,6 +198,8 @@ scrape_configs:
         - https://code.finsec.localdomain        
 #auth
         - https://auth.finsec.localdomain
+#garage
+        - https://storage.finsec.localdomain/health
 #paperless
         - https://docs.finsec.localdomain        
 #menu
