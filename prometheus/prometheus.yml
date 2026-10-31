@@ -199,6 +199,8 @@ scrape_configs:
         - https://dojo.finsec.localdomain
 #code
         - https://code.finsec.localdomain        
+#auth
+        - https://auth.finsec.localdomain
 #paperless
         - https://docs.finsec.localdomain        
 #menu
