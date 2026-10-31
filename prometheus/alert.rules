@@ -119,6 +119,15 @@ groups:
       summary: "Downloads from {{ $labels.host }} keep failing ({{ $value }} URLs)"
       description: "yt-dlp cannot fetch {{ $value }} bookmarked URLs from {{ $labels.host }}: the extractor may be broken (rebuild stash with a newer yt-dlp), the site blocks this host (proxy), or the links are dead. See state.json in $DATA_DIR/stash/config/bookmark-dl."
 
+  - alert: bookmark_download_scan_failing
+    expr: bookmark_dl_scan_ok == 0
+    for: 1h
+    labels:
+      severity: warning
+    annotations:
+      summary: "Stash could not start the scan after the bookmark downloads"
+      description: "scan.py got an error from the Stash API (key in finsec.localdomain/stash/bookmark-dl.env; see run.log). New downloads are not scanned until it works."
+
   # Memory pressure and crash loops. Background: cAdvisor sat at its memory limit and was OOM-killed ~35,000 times while swapping 22 MB/s
   # to the NVMe mirror for months, and nothing noticed (see devops issue #39). Normal swap-out here is ~0 MB/s.
   - alert: swap_thrashing
