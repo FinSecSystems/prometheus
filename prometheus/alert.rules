@@ -100,6 +100,16 @@ groups:
       summary: "Timeshift backup monitoring is not reporting"
       description: "timeshift.prom has not been updated for over an hour: check the cron job scripts/timeshift-metrics.sh and the node-exporter textfile mount."
 
+  # Hard-linked copy of the newest Timeshift snapshot for the Glacier job (scripts/timeshift-offsite-link.sh, cron 03:30, docs/backups.md, issue #57)
+  - alert: timeshift_offsite_copy_stale
+    expr: timeshift_offsite_copy_ok == 0 or time() - timeshift_offsite_copy_snapshot_timestamp_seconds > 48 * 3600 or absent(timeshift_offsite_copy_ok)
+    for: 2h
+    labels:
+      severity: warning
+    annotations:
+      summary: "The off-site copy of the newest Timeshift snapshot is missing or older than 48 hours"
+      description: "scripts/timeshift-offsite-link.sh did not link the newest snapshot into /Backup/TimeShift/grimlock/offsite (see ~/timeshift-offsite-link.log); the Glacier job would upload an old snapshot."
+
   # Bookmark downloads (stash/bookmark-dl/run.sh, daily 02:30; metrics via the node-exporter textfile collector, docs/stash.md)
   - alert: bookmark_download_stale
     expr: time() - bookmark_dl_last_run_timestamp_seconds > 36 * 3600 or absent(bookmark_dl_last_run_timestamp_seconds)
@@ -127,6 +137,15 @@ groups:
     annotations:
       summary: "Stash could not start the scan after the bookmark downloads"
       description: "scan.py got an error from the Stash API (key in finsec.localdomain/stash/bookmark-dl.env; see run.log). New downloads are not scanned until it works."
+
+  - alert: bookmark_download_enrich_failing
+    expr: bookmark_dl_enrich_ok == 0
+    for: 1h
+    labels:
+      severity: warning
+    annotations:
+      summary: "Stash could not add metadata to the bookmark downloads"
+      description: "enrich.py failed after the scan (source URL, scrape, Identify, Generate, Auto Tag; see run.log and the stash-app log). New downloads keep the title from yt-dlp only and stay without the tag bookmark-dl-enriched; the next run retries them."
 
   # Memory pressure and crash loops. Background: cAdvisor sat at its memory limit and was OOM-killed ~35,000 times while swapping 22 MB/s
   # to the NVMe mirror for months, and nothing noticed (see devops issue #39). Normal swap-out here is ~0 MB/s.
