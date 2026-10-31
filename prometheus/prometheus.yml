@@ -110,9 +110,6 @@ scrape_configs:
 #mattermost          
         - https://chatdb.finsec.localdomain
         - https://chat.finsec.localdomain
-#minio
-#        - https://storage.finsec.localdomain  # s3 protocol
-        - https://console.storage.finsec.localdomain
 #prometheus          
         - https://blackbox-exporter.finsec.localdomain
         - https://monitor.finsec.localdomain
