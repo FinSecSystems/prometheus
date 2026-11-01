@@ -110,6 +110,25 @@ groups:
       summary: "The off-site copy of the newest Timeshift snapshot is missing or older than 48 hours"
       description: "scripts/timeshift-offsite-link.sh did not link the newest snapshot into /Backup/TimeShift/grimlock/offsite (see ~/timeshift-offsite-link.log); the Glacier job would upload an old snapshot."
 
+  # Restore tests of the database dumps (scripts/db-restore-test.sh, cron Sundays 05:15, docs/backups.md, issue #58)
+  - alert: db_restore_test_failed
+    expr: db_restore_test_ok == 0
+    for: 1h
+    labels:
+      severity: warning
+    annotations:
+      summary: "Restore test of {{ $labels.db }} failed"
+      description: "The newest dump of {{ $labels.db }} in the offsite Timeshift copy could not be restored into a throwaway container (or, for vaultwarden-export, the export is missing or not valid). See ~/db-restore-test.log."
+
+  - alert: db_restore_test_stale
+    expr: time() - db_restore_test_last_success_timestamp_seconds > 60 * 86400 or absent(db_restore_test_last_success_timestamp_seconds)
+    for: 1d
+    labels:
+      severity: warning
+    annotations:
+      summary: "No successful restore test of {{ $labels.db }} for 60 days"
+      description: "The weekly rotation tests four databases per run, so every database should be tested about every five weeks. Check the cron job and ~/db-restore-test.log."
+
   # Bookmark downloads (stash/bookmark-dl/run.sh, daily 02:30; metrics via the node-exporter textfile collector, docs/stash.md)
   - alert: bookmark_download_stale
     expr: time() - bookmark_dl_last_run_timestamp_seconds > 36 * 3600 or absent(bookmark_dl_last_run_timestamp_seconds)
