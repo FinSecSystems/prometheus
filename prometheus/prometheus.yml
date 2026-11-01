@@ -94,8 +94,8 @@ scrape_configs:
         - https://diagram.finsec.localdomain
           #        - https://projects.finsec.localdomain TBD
 #helpdesk
-#        - https://helpdesk.finsec.localdomain
-#        - https://helpdeskdb.finsec.localdomain
+        - https://helpdesk.finsec.localdomain
+        - https://helpdeskdb.finsec.localdomain
 #firefox
         - https://sync.finsec.localdomain
 #limesurvey          
@@ -165,6 +165,9 @@ scrape_configs:
           #- https://socialdb.finsec.localdomain
           #        - https://socialredis.finsec.localdomain # Requires authentication
           #        - wss://stream.social.redis.finsec.localdomain
+#protonmail
+        - https://protonmail.finsec.localdomain
+        - https://protonmaildb.finsec.localdomain
 #vaultwarden
         - https://vault.finsec.localdomain
         - https://vaultdb.finsec.localdomain
