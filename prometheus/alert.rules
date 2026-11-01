@@ -147,6 +147,24 @@ groups:
       summary: "Stash could not add metadata to the bookmark downloads"
       description: "enrich.py failed after the scan (source URL, scrape, Identify, Generate, Auto Tag; see run.log and the stash-app log). New downloads keep the title from yt-dlp only and stay without the tag bookmark-dl-enriched; the next run retries them."
 
+  - alert: library_watch_failing
+    expr: library_watch_scan_ok == 0 or library_watch_enrich_ok == 0
+    for: 1h
+    labels:
+      severity: warning
+    annotations:
+      summary: "The 3am Stash library watcher failed to scan or enrich new files"
+      description: "watch.sh could not start the scan or enrich.py failed (run.log in $DATA_DIR/stash/config/bookmark-dl, stash-app log). The next run retries the same window."
+
+  - alert: library_watch_not_running
+    expr: time() - library_watch_last_run_timestamp_seconds > 36 * 3600 or absent(library_watch_last_run_timestamp_seconds)
+    for: 1h
+    labels:
+      severity: warning
+    annotations:
+      summary: "The Stash library watcher has not run for 36 hours"
+      description: "Check the cron job (0 3 * * * watch.sh) and run.log; stash-app must be running."
+
   # Memory pressure and crash loops. Background: cAdvisor sat at its memory limit and was OOM-killed ~35,000 times while swapping 22 MB/s
   # to the NVMe mirror for months, and nothing noticed (see devops issue #39). Normal swap-out here is ~0 MB/s.
   - alert: swap_thrashing
