@@ -203,6 +203,8 @@ scrape_configs:
         - https://auth.finsec.localdomain
 #garage
         - https://storage.finsec.localdomain/health
+#windows
+        - https://windows.finsec.localdomain
 #paperless
         - https://docs.finsec.localdomain        
 #menu
