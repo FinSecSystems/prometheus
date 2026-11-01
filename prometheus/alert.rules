@@ -148,7 +148,7 @@ groups:
       description: "enrich.py failed after the scan (source URL, scrape, Identify, Generate, Auto Tag; see run.log and the stash-app log). New downloads keep the title from yt-dlp only and stay without the tag bookmark-dl-enriched; the next run retries them."
 
   - alert: library_watch_failing
-    expr: library_watch_scan_ok == 0 or library_watch_enrich_ok == 0
+    expr: library_watch_scan_ok == 0 or library_watch_enrich_ok == 0 or library_watch_trash_ok == 0
     for: 1h
     labels:
       severity: warning
