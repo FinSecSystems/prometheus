@@ -64,6 +64,79 @@ scrape_configs:
     static_configs:
     - targets: ['prometheus-node-exporter:9100']
 
+  # Database and Redis exporters (issue #18, docs/monitoring.md): one exporter per kind, the target goes in as a URL parameter.
+  # Keep the target lists in sync with PG / MYSQL / REDIS_AUTH in ../exporters-init.sh.
+  - job_name: 'redis'
+    scrape_interval: 60s
+    metrics_path: /scrape
+    static_configs:
+    - targets:
+      - redis://gitlab-redis:6379
+      - redis://nextcloud-redis:6379
+      - redis://paperless-broker:6379
+      - redis://security-dojo-valkey:6379
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        regex: 'redis://([^:]+):.*'
+        replacement: '$1'
+        target_label: instance
+      - target_label: __address__
+        replacement: prometheus-redis-exporter:9121
+
+  - job_name: 'postgres'
+    scrape_interval: 60s
+    scrape_timeout: 30s
+    metrics_path: /probe
+    params:
+      auth_module: [exporter]
+    static_configs:
+    - targets:
+      - gitlab-postgresql:5432
+      - helpdesk-postgresql:5432
+      - mail-roundcube-db:5432
+      - mattermost-db:5432
+      - openproject-db:5432
+      - protonmail-roundcubedb:5432
+      - security-dojo-db:5432
+      - vaultwarden-db:5432
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: '(.*)'
+        replacement: '${1}/postgres'      # the exporter user has no database of its own
+        target_label: __param_target
+      - source_labels: [__address__]
+        regex: '([^:]+):.*'
+        replacement: '$1'
+        target_label: instance
+      - target_label: __address__
+        replacement: prometheus-postgres-exporter:9187
+
+  - job_name: 'mysql'
+    scrape_interval: 60s
+    scrape_timeout: 30s
+    metrics_path: /probe
+    static_configs:
+    - targets:
+      - limesurvey-db:3306
+      - matomo-db:3306
+      - nextcloud-db:3306
+      - nextcloud-screeenly-db:3306
+      - paperless-db:3306
+      - photos-db:4001                     # listens on 4001 (--port=4001)
+      - pictures-db:4001                   # listens on 4001 (--port=4001)
+      - websites-liquibrium-exchange-db:3306
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__address__]
+        regex: '([^:]+):.*'
+        replacement: '$1'
+        target_label: instance
+      - target_label: __address__
+        replacement: prometheus-mysqld-exporter:9104
+
   - job_name: 'blackbox'
     scrape_interval: 60s
     metrics_path: /probe

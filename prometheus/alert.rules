@@ -239,3 +239,104 @@ groups:
     annotations:
       summary: "Database dump monitoring is not reporting"
       description: "db_dump.prom has not been updated for 36 hours: check the cron job scripts/db-dump.sh and the node-exporter textfile mount."
+
+  # Databases and Redis (exporters in the prometheus stack, issue #18; thresholds are well above normal use: max_connections is 100 to 512)
+  - alert: database_down
+    expr: pg_up == 0 or mysql_up == 0 or redis_up == 0
+    for: 5m
+    labels:
+      severity: page
+    annotations:
+      summary: "Database {{ $labels.instance }} is not answering the exporter"
+      description: "{{ $labels.instance }} ({{ $labels.job }}) has not accepted a monitoring connection for 5 minutes: the database is down, out of connections, or the exporter user is missing (rerun finsec.localdomain/prometheus/exporters-init.sh)."
+
+  - alert: postgres_connections_high
+    expr: sum by (instance) (pg_stat_database_numbackends) / max by (instance) (pg_settings_max_connections) > 0.8
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "{{ $labels.instance }} uses {{ $value | humanizePercentage }} of its connections"
+      description: "More than 80% of max_connections are in use for 10 minutes; applications will start to fail with 'too many clients'. Look at pg_stat_activity."
+
+  - alert: mysql_connections_high
+    expr: mysql_global_status_threads_connected / mysql_global_variables_max_connections > 0.8
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "{{ $labels.instance }} uses {{ $value | humanizePercentage }} of its connections"
+      description: "More than 80% of max_connections are in use for 10 minutes. Look at SHOW PROCESSLIST."
+
+  - alert: redis_rejecting_connections
+    expr: increase(redis_rejected_connections_total[10m]) > 0
+    labels:
+      severity: warning
+    annotations:
+      summary: "{{ $labels.instance }} rejected {{ $value }} connections in 10 minutes"
+      description: "Redis hit maxclients; clients are being refused."
+
+  # Certificates seen by the blackbox probes (https targets; internal CA and public)
+  - alert: certificate_expires_soon
+    expr: (probe_ssl_earliest_cert_expiry - time()) < 14 * 86400 and probe_ssl_earliest_cert_expiry > 0
+    for: 1h
+    labels:
+      severity: warning
+    annotations:
+      summary: "Certificate of {{ $labels.instance }} expires in {{ $value | humanizeDuration }}"
+      description: "The certificate presented by {{ $labels.instance }} expires within 14 days. Internal names: docker exec operations-ca /workdir/generate_cert.sh <host> and reload the proxy; public names: check the Cloudflare/origin certificate."
+
+  - alert: certificate_expires_very_soon
+    expr: (probe_ssl_earliest_cert_expiry - time()) < 3 * 86400 and probe_ssl_earliest_cert_expiry > 0
+    for: 10m
+    labels:
+      severity: page
+    annotations:
+      summary: "Certificate of {{ $labels.instance }} expires in {{ $value | humanizeDuration }}"
+      description: "The certificate presented by {{ $labels.instance }} expires within 3 days."
+
+  # Disk: low_disk_space above fires at 10% free; these two give an earlier warning and a trend
+  - alert: disk_usage_high
+    expr: (1 - node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs|ramfs|nsfs"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay|squashfs|ramfs|nsfs"}) * 100 > 85
+    for: 30m
+    labels:
+      severity: warning
+    annotations:
+      summary: "{{ $labels.mountpoint }} on {{ $labels.instance }} is {{ $value | printf \"%.0f\" }}% full"
+      description: "More than 85% used for 30 minutes. Old images (docker image prune), rollback copies (scripts/*cleanup*.sh) and logs are the usual candidates."
+
+  - alert: disk_filling_up
+    expr: predict_linear(node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs|ramfs|nsfs"}[6h], 4 * 86400) < 0 and node_filesystem_avail_bytes / node_filesystem_size_bytes < 0.4
+    for: 1h
+    labels:
+      severity: warning
+    annotations:
+      summary: "{{ $labels.mountpoint }} on {{ $labels.instance }} will be full within 4 days at the current rate"
+      description: "The last 6 hours of growth extrapolate to a full disk within 4 days (the filesystem is also below 40% free)."
+
+  # Prometheus itself (it cannot alert about being down: the external check is Uptime Kuma / the blackbox probe of prometheus.finsec.localdomain)
+  - alert: prometheus_config_reload_failed
+    expr: prometheus_config_last_reload_successful == 0
+    for: 5m
+    labels:
+      severity: page
+    annotations:
+      summary: "Prometheus could not load its configuration"
+      description: "The last reload of prometheus.yml or alert.rules failed (docker logs prometheus-app); it keeps running with the old configuration."
+
+  - alert: prometheus_alerts_not_delivered
+    expr: rate(prometheus_notifications_errors_total[10m]) > 0 or prometheus_notifications_alertmanagers_discovered < 1
+    for: 10m
+    labels:
+      severity: page
+    annotations:
+      summary: "Prometheus cannot deliver alerts to Alertmanager"
+      description: "Notifications to prometheus-alertmanager fail or no Alertmanager is discovered, so no alert mail is sent."
+
+  - alert: prometheus_restarted
+    expr: changes(process_start_time_seconds{job="prometheus"}[30m]) > 0
+    labels:
+      severity: warning
+    annotations:
+      summary: "Prometheus restarted in the last 30 minutes"
+      description: "prometheus-app was (re)started. Planned (config or image change) restarts are expected; otherwise look at docker inspect prometheus-app and the data directory (local disk since 2026-11-01)."

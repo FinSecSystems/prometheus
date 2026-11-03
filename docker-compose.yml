@@ -14,7 +14,7 @@ services:
       retries: 5
     volumes:
       - ./prometheus/:/etc/prometheus/
-      - ${NR_DATA_DIR}/prometheus:/prometheus:rw
+      - ${DB_DIR}/prometheus:/prometheus:rw   # TSDB on local disk: Prometheus does not support NFS (moved from $NR_DATA_DIR on 2026-11-01, old copy kept for rollback)
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -439,6 +439,64 @@ services:
       operations_intranet:
         ipv4_address: 172.34.7.17
 
+  # Database and Redis exporters (issue #18). Multi-target: one exporter per kind, Prometheus passes the target as a URL parameter (jobs "redis", "postgres", "mysql").
+  # The monitoring user "exporter" and the rendered configs in ${BUILD_DIR}/prometheus/exporters come from ./exporters-init.sh (password in the git-crypt file exporters.env).
+  redis-exporter:
+    image: oliver006/redis_exporter:v1.96.0-alpine
+    container_name: prometheus-redis-exporter
+    dns: ${DNS_IP_INTERNAL}
+    external_links:
+      - operations:dns
+    restart: ${RESTART}
+    command:
+      - --redis.password-file=/cfg/redis-passwords.json   # allow-secret (a path to the rendered file, not a value)
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "--no-verbose", "--tries=1", "http://prometheus-redis-exporter:9121/metrics"]
+      interval: 300s
+      timeout: 120s
+      start_period: 100s
+      retries: 5
+    volumes:
+      - ${BUILD_DIR}/prometheus/exporters/redis-passwords.json:/cfg/redis-passwords.json:ro
+    networks:
+      operations_intranet:
+        ipv4_address: 172.34.7.18
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.20.1
+    container_name: prometheus-postgres-exporter
+    dns: ${DNS_IP_INTERNAL}
+    external_links:
+      - operations:dns
+    restart: ${RESTART}
+    command:
+      - --config.file=/cfg/postgres_exporter.yml
+    volumes:
+      - ${BUILD_DIR}/prometheus/exporters/postgres_exporter.yml:/cfg/postgres_exporter.yml:ro
+    networks:
+      operations_intranet:
+        ipv4_address: 172.34.7.19
+
+  mysqld-exporter:
+    image: prom/mysqld-exporter:v0.21.0
+    container_name: prometheus-mysqld-exporter
+    dns: ${DNS_IP_INTERNAL}
+    external_links:
+      - operations:dns
+    restart: ${RESTART}
+    command:
+      - --config.my-cnf=/cfg/my.cnf
+      - --no-collect.slave_status          # needs SLAVE MONITOR; none of the servers replicates
+    volumes:
+      - ${BUILD_DIR}/prometheus/exporters/my.cnf:/cfg/my.cnf:ro
+    networks:
+      operations_intranet:
+        ipv4_address: 172.34.7.20
+      liquibrium_intranet:                 # websites-liquibrium-exchange-db lives only on this network
+        ipv4_address: 172.37.3.2
+
 networks:
   operations_intranet:
+    external: true
+  liquibrium_intranet:
     external: true
