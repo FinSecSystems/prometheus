@@ -129,6 +129,34 @@ groups:
       summary: "No successful restore test of {{ $labels.db }} for 60 days"
       description: "The weekly rotation tests four databases per run, so every database should be tested about every five weeks. Check the cron job and ~/db-restore-test.log."
 
+  # TLS certificates of finsec.localdomain and liquibrium.localdomain (scripts/renew-certs.sh, cron 04:40 daily, docs/certificates.md)
+  - alert: cert_expiring_soon
+    expr: cert_expiry_min_days < 7
+    for: 1h
+    labels:
+      severity: page
+    annotations:
+      summary: "A {{ $labels.domain }} certificate expires in {{ $value }} days"
+      description: "scripts/renew-certs.sh should have renewed it 14 days before expiry. Run it by hand (scripts/renew-certs.sh --check, see ~/renew-certs.log); the CA container or the edge proxy may be down."
+
+  - alert: cert_renewal_failed
+    expr: cert_renew_failed > 0
+    for: 1h
+    labels:
+      severity: warning
+    annotations:
+      summary: "Certificate renewal for {{ $labels.domain }} failed ({{ $value }} problems)"
+      description: "See ~/renew-certs.log: the CA did not answer, the new certificate did not check out, or the proxy could not be reloaded."
+
+  - alert: cert_renew_stale
+    expr: time() - cert_renew_last_run_timestamp_seconds > 36 * 3600 or absent(cert_renew_last_run_timestamp_seconds)
+    for: 2h
+    labels:
+      severity: warning
+    annotations:
+      summary: "The certificate renewal job has not run for 36 hours"
+      description: "Check the cron job of scripts/renew-certs.sh and ~/renew-certs.log (it skips quietly while /mnt/storage is not mounted)."
+
   # Bookmark downloads (stash/bookmark-dl/run.sh, daily 02:30; metrics via the node-exporter textfile collector, docs/stash.md)
   - alert: bookmark_download_stale
     expr: time() - bookmark_dl_last_run_timestamp_seconds > 36 * 3600 or absent(bookmark_dl_last_run_timestamp_seconds)
