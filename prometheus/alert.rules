@@ -186,7 +186,7 @@ groups:
       description: "Receive and transmit errors on a port point to a bad cable or a duplex/speed problem."
 
   - alert: nic_throughput_low
-    expr: nic_iperf_send_bits_per_second{server="nas"} < 1.5e9 or nic_iperf_receive_bits_per_second{server="nas"} < 1.5e9
+    expr: nic_iperf_send_bits_per_second{server=~"nas2?"} < 1.5e9 or nic_iperf_receive_bits_per_second{server=~"nas2?"} < 1.5e9
     for: 10m
     labels:
       severity: warning
@@ -195,7 +195,7 @@ groups:
       description: "Weekly throughput test to the NAS from scripts/nic-iperf.sh. The ports are 2.5 Gbit/s; the NAS's own link or a busy NAS can also be the limit. The COMPUTRON test (a PC that is often off) has no alert; compare it in Grafana."
 
   - alert: nic_iperf_stale
-    expr: time() - nic_iperf_last_success_timestamp_seconds{server="nas"} > 9 * 86400 or absent(nic_iperf_last_success_timestamp_seconds{server="nas"})
+    expr: time() - nic_iperf_last_success_timestamp_seconds{server=~"nas2?"} > 9 * 86400 or absent(nic_iperf_last_success_timestamp_seconds{server=~"nas2?"})
     for: 1h
     labels:
       severity: warning
