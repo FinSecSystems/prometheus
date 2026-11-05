@@ -1,7 +1,7 @@
 services:
 
   app:
-    image: prom/prometheus@sha256:e2b8aa62b64855956e3ec1e18b4f9387fb6203174a4471936f4662f437f04405  # pinned digest (was untagged; version unknown, 2026-10-18)
+    image: prom/prometheus:v3.16.0   # was a digest of 3.3.1 (issue #9, 2026-11-05)
     container_name: prometheus-app
     dns: ${DNS_IP_INTERNAL}
     external_links:
@@ -137,7 +137,7 @@ services:
         ipv4_address: 172.34.7.5
 
   grafana:
-    image: grafana/grafana@sha256:52c3e20686b860c6dc1f623811565773cf51eefa378817a4896dfc863c3c82c8  # pinned digest (was untagged; version unknown, 2026-10-18)
+    image: grafana/grafana:13.2.5   # was a digest of 11.6.1 (issue #9, 2026-11-05); rollback: restore /home/ubuntu/dashboards-upgrade-backup-20261105/grafana.tgz into $DATA_DIR/grafana
     container_name: prometheus-grafana
     dns: ${DNS_IP_INTERNAL}
     external_links:
