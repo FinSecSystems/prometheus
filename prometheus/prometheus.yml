@@ -280,6 +280,8 @@ scrape_configs:
         - https://storage.finsec.localdomain/health
 #windows
         - https://windows.finsec.localdomain
+#llm
+        - https://llm.finsec.localdomain/v1/models
 #paperless
         - https://docs.finsec.localdomain        
 #menu
