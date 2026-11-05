@@ -32,7 +32,7 @@ services:
           - prometheus
 
   node-exporter:
-    image: prom/node-exporter@sha256:d00a542e409ee618a4edc67da14dd48c5da66726bbd5537ab2af9c1dfc442c8a  # pinned digest (was untagged; version unknown, 2026-10-18)
+    image: prom/node-exporter:v1.12.1   # was a digest of 1.9.1 (issue #9, 2026-11-05)
     container_name: prometheus-node-exporter
     dns: ${DNS_IP_INTERNAL}
     external_links:
@@ -64,7 +64,7 @@ services:
         ipv4_address: 172.34.7.3
 
   alertmanager:
-    image: prom/alertmanager@sha256:27c475db5fb156cab31d5c18a4251ac7ed567746a2483ff264516437a39b15ba  # pinned digest (was untagged; version unknown, 2026-10-18)
+    image: prom/alertmanager:v0.34.2   # was a digest of 0.28.1 (issue #9, 2026-11-05)
     container_name: prometheus-alertmanager
     dns: ${DNS_IP_INTERNAL}
     external_links:
@@ -89,7 +89,7 @@ services:
         ipv4_address: 172.34.7.4
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor@sha256:3cde6faf0791ebf7b41d6f8ae7145466fed712ea6f252c935294d2608b1af388  # pinned digest (was untagged; version unknown, 2026-10-18)
+    image: gcr.io/cadvisor/cadvisor:v0.55.1   # was a digest of 0.49.1 (issue #9, 2026-11-05)
     container_name: prometheus-cadvisor
     dns: ${DNS_IP_INTERNAL}
     external_links:
@@ -314,7 +314,7 @@ services:
         ipv4_address: 172.34.7.12
 
   blackbox-exporter:
-    image: prom/blackbox-exporter@sha256:92e05d5fe0df01d3980518dc42f07b778a8997048b57392ebc7f7391ebd7bb06  # pinned digest (was untagged; version unknown, 2026-10-18)
+    image: prom/blackbox-exporter:v0.29.1   # was a digest of 0.26.0 (issue #9, 2026-11-05)
     container_name: prometheus-blackbox-exporter
     dns: ${DNS_IP_INTERNAL}
     restart: ${RESTART}
