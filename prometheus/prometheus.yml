@@ -259,6 +259,8 @@ scrape_configs:
         - https://stash.finsec.localdomain
 #pdf
         - https://pdf.finsec.localdomain
+#speedtest
+        - https://speedtest.finsec.localdomain
 #uptime
         - https://uptime.finsec.localdomain
 #audiobooks

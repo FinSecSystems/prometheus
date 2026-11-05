@@ -157,6 +157,71 @@ groups:
       summary: "The certificate renewal job has not run for 36 hours"
       description: "Check the cron job of scripts/renew-certs.sh and ~/renew-certs.log (it skips quietly while /mnt/storage is not mounted)."
 
+  # Network ports of the host (node-exporter; eth1 and eth2 are 2.5 Gbit/s ports of the bridge br0, eth0 is deliberately unplugged), docs/network.md
+  - alert: nic_link_down
+    expr: node_network_carrier{device=~"eth[12]"} == 0
+    for: 5m
+    labels:
+      severity: page
+    annotations:
+      summary: "Network port {{ $labels.device }} has no link on {{ $labels.instance }}"
+      description: "The cable or the switch port of {{ $labels.device }} is down."
+
+  - alert: nic_link_speed_low
+    expr: node_network_speed_bytes{device=~"eth[12]"} > 0 and node_network_speed_bytes{device=~"eth[12]"} < 3.125e8
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Network port {{ $labels.device }} negotiated only {{ $value | humanize }}B/s instead of 2.5 Gbit/s"
+      description: "Bad cable, switch port limited to 1 Gbit/s or 100 Mbit/s, or a flapping link. Check `ethtool {{ $labels.device }}` and the cable."
+
+  - alert: nic_errors
+    expr: increase(node_network_receive_errs_total{device=~"eth[12]"}[1h]) + increase(node_network_transmit_errs_total{device=~"eth[12]"}[1h]) > 20
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Network port {{ $labels.device }} counted {{ $value | humanize }} errors in the last hour"
+      description: "Receive and transmit errors on a port point to a bad cable or a duplex/speed problem."
+
+  - alert: nic_throughput_low
+    expr: nic_iperf_send_bits_per_second < 1.5e9 or nic_iperf_receive_bits_per_second < 1.5e9
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "iperf3 to {{ $labels.server }} reaches only {{ $value | humanize }}bit/s"
+      description: "Weekly throughput test from scripts/nic-iperf.sh. The ports are 2.5 Gbit/s; the server's own link or a busy host can also be the limit."
+
+  - alert: nic_iperf_stale
+    expr: time() - nic_iperf_last_run_timestamp_seconds > 9 * 86400
+    for: 1h
+    labels:
+      severity: warning
+    annotations:
+      summary: "The weekly iperf3 throughput test has not run for 9 days"
+      description: "Check the cron job of scripts/nic-iperf.sh, ~/nic-iperf.log and that the iperf3 server answers."
+
+  # Internet speed (Speedtest Tracker, stack speedtest; scripts/speedtest-metrics.sh every 15 min, docs/speedtest.md)
+  - alert: internet_speed_low
+    expr: speedtest_download_bits_per_second < 100e6
+    for: 12h
+    labels:
+      severity: warning
+    annotations:
+      summary: "Internet download speed has been below 100 Mbit/s for 12 hours ({{ $value | humanize }}bit/s)"
+      description: "Results of the last tests in https://speedtest.finsec.localdomain. Adjust the threshold in alert.rules to your line speed."
+
+  - alert: internet_speedtest_stale
+    expr: time() - speedtest_last_result_timestamp_seconds > 2 * 86400
+    for: 1h
+    labels:
+      severity: warning
+    annotations:
+      summary: "No successful internet speed test for 2 days"
+      description: "Speedtest Tracker (speedtest-app) tests every 6 hours; check its results page and `docker logs speedtest-app`."
+
   # Bookmark downloads (stash/bookmark-dl/run.sh, daily 02:30; metrics via the node-exporter textfile collector, docs/stash.md)
   - alert: bookmark_download_stale
     expr: time() - bookmark_dl_last_run_timestamp_seconds > 36 * 3600 or absent(bookmark_dl_last_run_timestamp_seconds)
