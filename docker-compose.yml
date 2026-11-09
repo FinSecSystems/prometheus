@@ -124,6 +124,9 @@ services:
       - '-whitelisted_container_labels=com.docker.compose.project,com.docker.compose.service'
       - '-event_storage_age_limit=default=0'
       - '-event_storage_event_limit=default=0'
+      - '-logtostderr=false'          # glog: only ERROR and above to stderr, WARN (stale-container spam) goes to a file
+      - '-stderrthreshold=2'
+      - '-log_file=/dev/null'
     deploy:
       mode: global
       resources:

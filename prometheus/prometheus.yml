@@ -40,6 +40,7 @@ scrape_configs:
 
     # Override the global default and scrape targets from this job every 5 seconds.
     scrape_interval: 5s
+    honor_timestamps: false   # cAdvisor timestamps of stale cgroups trigger 'too old' warnings
 
     dns_sd_configs:
     - names:
