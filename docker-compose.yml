@@ -155,6 +155,10 @@ services:
       - ./grafana/provisioning/:/etc/grafana/provisioning:rw
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini
       - ./grafana/ldap.toml:/etc/grafana/ldap.toml
+    environment:
+      # Grafana 13 downloads its core plugins (prometheus, influxdb, ...) into /var/lib/grafana/plugins at start; that is the NFS share
+      # ($DATA_DIR is noexec), so their backends fail with "permission denied" and every panel shows N/A. Use the bundled ones.
+      GF_PLUGINS_PREINSTALL_DISABLED: "true"
     env_file:
       - ./grafana/config.monitoring
       - ./prometheus.env
