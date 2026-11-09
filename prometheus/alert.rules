@@ -433,3 +433,50 @@ groups:
     annotations:
       summary: "Prometheus restarted in the last 30 minutes"
       description: "prometheus-app was (re)started. Planned (config or image change) restarts are expected; otherwise look at docker inspect prometheus-app and the data directory (local disk since 2026-11-01)."
+
+  # perseus NAS (job 'perseus', node_exporter :9100 and process-exporter :9256 in Container Station). The process alerts name the culprit in the
+  # groupname label; grouping is by process name (comm), see /share/Container/monitoring/process-exporter.yml on perseus.
+  - alert: perseus_exporter_down
+    expr: up{job="perseus"} == 0
+    for: 15m
+    labels:
+      severity: warning
+    annotations:
+      summary: "perseus {{ $labels.exporter }} exporter down"
+      description: "Check the perseus-node-exporter / perseus-process-exporter containers in Container Station (ssh perseus, docker ps)."
+
+  - alert: perseus_high_cpu
+    expr: 1 - avg(rate(node_cpu_seconds_total{job="perseus",mode="idle"}[5m])) > 0.85
+    for: 30m
+    labels:
+      severity: warning
+    annotations:
+      summary: "perseus CPU above 85% for 30 minutes"
+      description: "See the top processes: topk(5, sum by (groupname) (rate(namedprocess_namegroup_cpu_seconds_total{job=\"perseus\"}[5m])))."
+
+  - alert: perseus_low_memory
+    expr: node_memory_MemAvailable_bytes{job="perseus"} / node_memory_MemTotal_bytes{job="perseus"} < 0.1
+    for: 15m
+    labels:
+      severity: warning
+    annotations:
+      summary: "perseus has {{ $value | humanizePercentage }} memory available"
+      description: "See the top processes: topk(5, namedprocess_namegroup_memory_bytes{job=\"perseus\",memtype=\"resident\"})."
+
+  - alert: perseus_process_cpu_hog
+    expr: sum by (groupname) (rate(namedprocess_namegroup_cpu_seconds_total{job="perseus"}[5m])) > 1.5
+    for: 30m
+    labels:
+      severity: warning
+    annotations:
+      summary: "perseus process {{ $labels.groupname }} uses {{ $value | humanize }} CPU cores for 30 minutes"
+      description: "A single process group is using more than 1.5 cores on perseus."
+
+  - alert: perseus_process_memory_hog
+    expr: namedprocess_namegroup_memory_bytes{job="perseus",memtype="resident"} > 4e9
+    for: 30m
+    labels:
+      severity: warning
+    annotations:
+      summary: "perseus process {{ $labels.groupname }} holds {{ $value | humanize1024 }}B resident memory"
+      description: "A single process group is holding more than 4 GB of the 16 GB RAM on perseus."

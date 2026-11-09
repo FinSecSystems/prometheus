@@ -64,6 +64,15 @@ scrape_configs:
     static_configs:
     - targets: ['prometheus-node-exporter:9100']
 
+  # perseus NAS (192.168.2.8): node_exporter and process-exporter containers run in its Container Station (/share/Container/monitoring)
+  - job_name: 'perseus'
+    scrape_interval: 30s
+    static_configs:
+    - targets: ['192.168.2.8:9100']
+      labels: {host: perseus, exporter: node}
+    - targets: ['192.168.2.8:9256']
+      labels: {host: perseus, exporter: process}
+
   # Database and Redis exporters (issue #18, docs/monitoring.md): one exporter per kind, the target goes in as a URL parameter.
   # Keep the target lists in sync with PG / MYSQL / REDIS_AUTH in ../exporters-init.sh.
   - job_name: 'redis'
