@@ -186,22 +186,22 @@ groups:
       description: "Receive and transmit errors on a port point to a bad cable or a duplex/speed problem."
 
   - alert: nic_throughput_low
-    expr: nic_iperf_send_bits_per_second{server=~"nas2?"} < 1.5e9 or nic_iperf_receive_bits_per_second{server=~"nas2?"} < 1.5e9
+    expr: nic_iperf_send_bits_per_second{server=~"nas2?|router1"} < 1.5e9 or nic_iperf_receive_bits_per_second{server=~"nas2?|router1"} < 1.5e9
     for: 10m
     labels:
       severity: warning
     annotations:
       summary: "iperf3 to {{ $labels.server }} reaches only {{ $value | humanize }}bit/s"
-      description: "Daily throughput test to the NAS from scripts/nic-iperf.sh. The ports are 2.5 Gbit/s; the NAS's own link or a busy NAS can also be the limit. The COMPUTRON test (a PC that is often off) has no alert; compare it in Grafana."
+      description: "Daily throughput test to the NAS and to router1 (pfSense) from scripts/nic-iperf.sh. The ports are 2.5 Gbit/s (measured 2.35 Gbit/s to router1 and to the NAS); the other end's own link or load can also be the limit. The COMPUTRON test (a PC that is often off) has no alert; compare it in Grafana."
 
   - alert: nic_iperf_stale
-    expr: time() - nic_iperf_last_success_timestamp_seconds{server=~"nas2?"} > 3 * 86400 or absent(nic_iperf_last_success_timestamp_seconds{server=~"nas2?"})
+    expr: time() - nic_iperf_last_success_timestamp_seconds{server=~"nas2?|router1"} > 3 * 86400 or absent(nic_iperf_last_success_timestamp_seconds{server=~"nas2?|router1"})
     for: 1h
     labels:
       severity: warning
     annotations:
-      summary: "The daily iperf3 throughput test to the NAS has not succeeded for 3 days"
-      description: "Check the cron job of scripts/nic-iperf.sh, ~/nic-iperf.log and that the iperf3 server answers."
+      summary: "The daily iperf3 throughput test to {{ if $labels.server }}{{ $labels.server }}{{ else }}the NAS or router1{{ end }} has not succeeded for 3 days"
+      description: "Check the cron job of scripts/nic-iperf.sh, ~/nic-iperf.log and that the iperf3 server answers. For router1: System > Package Manager > Installed Packages must list iperf and the service must run (it can disappear in a pfSense upgrade, docs/speedtest.md)."
 
   # Internet speed (Speedtest Tracker, stack speedtest; scripts/speedtest-metrics.sh every 15 min, docs/speedtest.md)
   - alert: internet_speed_low
