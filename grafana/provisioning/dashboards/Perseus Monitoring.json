@@ -1,0 +1,1359 @@
+{
+  "title": "Perseus Monitoring",
+  "uid": "perseus-mon",
+  "schemaVersion": 39,
+  "version": 1,
+  "editable": true,
+  "refresh": "1m",
+  "tags": [
+    "perseus",
+    "nas",
+    "node-exporter",
+    "process-exporter"
+  ],
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "annotations": {
+    "list": []
+  },
+  "links": [],
+  "templating": {
+    "list": [
+      {
+        "name": "interval",
+        "label": "interval",
+        "type": "interval",
+        "query": "1m,5m,10m,30m,1h,6h,12h,1d",
+        "current": {
+          "text": "5m",
+          "value": "5m"
+        },
+        "auto": false,
+        "auto_count": 30,
+        "auto_min": "10s",
+        "hide": 0,
+        "refresh": 2,
+        "skipUrlSync": false,
+        "options": [
+          {
+            "selected": false,
+            "text": "1m",
+            "value": "1m"
+          },
+          {
+            "selected": true,
+            "text": "5m",
+            "value": "5m"
+          },
+          {
+            "selected": false,
+            "text": "10m",
+            "value": "10m"
+          },
+          {
+            "selected": false,
+            "text": "30m",
+            "value": "30m"
+          },
+          {
+            "selected": false,
+            "text": "1h",
+            "value": "1h"
+          },
+          {
+            "selected": false,
+            "text": "6h",
+            "value": "6h"
+          },
+          {
+            "selected": false,
+            "text": "12h",
+            "value": "12h"
+          },
+          {
+            "selected": false,
+            "text": "1d",
+            "value": "1d"
+          }
+        ]
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "row",
+      "title": "Host Info",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "panels": []
+    },
+    {
+      "id": 2,
+      "type": "gauge",
+      "title": "Memory usage",
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 0,
+        "y": 1
+      },
+      "targets": [
+        {
+          "expr": "(1 - node_memory_MemAvailable_bytes{job=\"perseus\"} / node_memory_MemTotal_bytes{job=\"perseus\"}) * 100",
+          "legendFormat": "",
+          "refId": "A",
+          "datasource": "Prometheus",
+          "interval": ""
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      }
+    },
+    {
+      "id": 3,
+      "type": "gauge",
+      "title": "CPU usage",
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 8,
+        "y": 1
+      },
+      "targets": [
+        {
+          "expr": "(1 - avg(rate(node_cpu_seconds_total{job=\"perseus\",mode=\"idle\"}[1m]))) * 100",
+          "legendFormat": "",
+          "refId": "A",
+          "datasource": "Prometheus",
+          "interval": ""
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      }
+    },
+    {
+      "id": 4,
+      "type": "gauge",
+      "title": "Filesystem usage (data volumes)",
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 16,
+        "y": 1
+      },
+      "targets": [
+        {
+          "expr": "(1 - sum(node_filesystem_avail_bytes{job=\"perseus\",mountpoint=~\"/share/(CE_)?CACHEDEV[0-9]+_DATA\"}) / sum(node_filesystem_size_bytes{job=\"perseus\",mountpoint=~\"/share/(CE_)?CACHEDEV[0-9]+_DATA\"})) * 100",
+          "legendFormat": "",
+          "refId": "A",
+          "datasource": "Prometheus",
+          "interval": ""
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      }
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Uptime",
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 0,
+        "y": 7
+      },
+      "targets": [
+        {
+          "expr": "time() - node_boot_time_seconds{job=\"perseus\"}",
+          "legendFormat": "",
+          "refId": "A",
+          "datasource": "Prometheus",
+          "interval": ""
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "area"
+      }
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Load 1m / cores",
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 5,
+        "w": 5,
+        "x": 6,
+        "y": 7
+      },
+      "targets": [
+        {
+          "expr": "node_load1{job=\"perseus\"} / count(node_cpu_seconds_total{job=\"perseus\",mode=\"idle\"})",
+          "legendFormat": "",
+          "refId": "A",
+          "datasource": "Prometheus",
+          "interval": ""
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 2
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "area"
+      }
+    },
+    {
+      "id": 7,
+      "type": "stat",
+      "title": "Exporters online",
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 11,
+        "y": 7
+      },
+      "targets": [
+        {
+          "expr": "sum(up{job=\"perseus\"})",
+          "legendFormat": "",
+          "refId": "A",
+          "datasource": "Prometheus",
+          "interval": ""
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 2
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "area"
+      }
+    },
+    {
+      "id": 8,
+      "type": "stat",
+      "title": "Perseus alerts firing",
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 5,
+        "w": 7,
+        "x": 17,
+        "y": 7
+      },
+      "targets": [
+        {
+          "expr": "count(ALERTS{alertstate=\"firing\",alertname=~\"perseus_.*\"}) or vector(0)",
+          "legendFormat": "",
+          "refId": "A",
+          "datasource": "Prometheus",
+          "interval": ""
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "area"
+      }
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "Node Network Traffic",
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 0,
+        "y": 12
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(node_network_receive_bytes_total{job=\"perseus\",device=~\"eth[0-9]+\"}[$interval]))",
+          "legendFormat": "receive",
+          "refId": "A",
+          "datasource": "Prometheus",
+          "interval": ""
+        },
+        {
+          "expr": "-sum(rate(node_network_transmit_bytes_total{job=\"perseus\",device=~\"eth[0-9]+\"}[$interval]))",
+          "legendFormat": "transmit",
+          "refId": "B",
+          "datasource": "Prometheus",
+          "interval": ""
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 15,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "Node Memory",
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 8,
+        "y": 12
+      },
+      "targets": [
+        {
+          "expr": "node_memory_MemTotal_bytes{job=\"perseus\"} - node_memory_MemAvailable_bytes{job=\"perseus\"}",
+          "legendFormat": "used",
+          "refId": "A",
+          "datasource": "Prometheus",
+          "interval": ""
+        },
+        {
+          "expr": "node_memory_MemAvailable_bytes{job=\"perseus\"}",
+          "legendFormat": "available",
+          "refId": "B",
+          "datasource": "Prometheus",
+          "interval": ""
+        },
+        {
+          "expr": "node_memory_SwapTotal_bytes{job=\"perseus\"} - node_memory_SwapFree_bytes{job=\"perseus\"}",
+          "legendFormat": "swap used",
+          "refId": "C",
+          "datasource": "Prometheus",
+          "interval": ""
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 15,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            }
+          },
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "Filesystem Available",
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 16,
+        "y": 12
+      },
+      "targets": [
+        {
+          "expr": "node_filesystem_avail_bytes{job=\"perseus\",mountpoint=~\"/share/(CE_)?CACHEDEV[0-9]+_DATA\"}",
+          "legendFormat": "{{mountpoint}}",
+          "refId": "A",
+          "datasource": "Prometheus",
+          "interval": ""
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 15,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            }
+          },
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 12,
+      "type": "timeseries",
+      "title": "CPU by mode",
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 0,
+        "y": 21
+      },
+      "targets": [
+        {
+          "expr": "avg by (mode) (rate(node_cpu_seconds_total{job=\"perseus\",mode!=\"idle\"}[$interval])) * 100",
+          "legendFormat": "{{mode}}",
+          "refId": "A",
+          "datasource": "Prometheus",
+          "interval": ""
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 40,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            }
+          },
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 13,
+      "type": "timeseries",
+      "title": "Load average",
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 8,
+        "y": 21
+      },
+      "targets": [
+        {
+          "expr": "node_load1{job=\"perseus\"}",
+          "legendFormat": "1m",
+          "refId": "A",
+          "datasource": "Prometheus",
+          "interval": ""
+        },
+        {
+          "expr": "node_load5{job=\"perseus\"}",
+          "legendFormat": "5m",
+          "refId": "B",
+          "datasource": "Prometheus",
+          "interval": ""
+        },
+        {
+          "expr": "node_load15{job=\"perseus\"}",
+          "legendFormat": "15m",
+          "refId": "C",
+          "datasource": "Prometheus",
+          "interval": ""
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 15,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            }
+          },
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 14,
+      "type": "timeseries",
+      "title": "Disk busy (io time)",
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 16,
+        "y": 21
+      },
+      "targets": [
+        {
+          "expr": "rate(node_disk_io_time_seconds_total{job=\"perseus\",device=~\"sd[a-z]+|nvme[0-9]+n[0-9]+\"}[$interval]) * 100",
+          "legendFormat": "{{device}}",
+          "refId": "A",
+          "datasource": "Prometheus",
+          "interval": ""
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 15,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            }
+          },
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 15,
+      "type": "row",
+      "title": "Process Performance",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 30
+      },
+      "panels": []
+    },
+    {
+      "id": 16,
+      "type": "timeseries",
+      "title": "Process CPU usage (cores)",
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 12,
+        "w": 12,
+        "x": 0,
+        "y": 31
+      },
+      "targets": [
+        {
+          "expr": "topk(10, sum by (groupname) (rate(namedprocess_namegroup_cpu_seconds_total{job=\"perseus\"}[$interval])))",
+          "legendFormat": "{{groupname}}",
+          "refId": "A",
+          "datasource": "Prometheus",
+          "interval": ""
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 15,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            }
+          },
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 17,
+      "type": "timeseries",
+      "title": "Process memory (resident)",
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 12,
+        "w": 12,
+        "x": 12,
+        "y": 31
+      },
+      "targets": [
+        {
+          "expr": "topk(10, namedprocess_namegroup_memory_bytes{job=\"perseus\",memtype=\"resident\"})",
+          "legendFormat": "{{groupname}}",
+          "refId": "A",
+          "datasource": "Prometheus",
+          "interval": ""
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 15,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            }
+          },
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 18,
+      "type": "timeseries",
+      "title": "Process disk read",
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 10,
+        "w": 6,
+        "x": 0,
+        "y": 43
+      },
+      "targets": [
+        {
+          "expr": "topk(10, sum by (groupname) (rate(namedprocess_namegroup_read_bytes_total{job=\"perseus\"}[$interval])))",
+          "legendFormat": "{{groupname}}",
+          "refId": "A",
+          "datasource": "Prometheus",
+          "interval": ""
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 15,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            }
+          },
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 19,
+      "type": "timeseries",
+      "title": "Process disk write",
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 10,
+        "w": 6,
+        "x": 6,
+        "y": 43
+      },
+      "targets": [
+        {
+          "expr": "topk(10, sum by (groupname) (rate(namedprocess_namegroup_write_bytes_total{job=\"perseus\"}[$interval])))",
+          "legendFormat": "{{groupname}}",
+          "refId": "A",
+          "datasource": "Prometheus",
+          "interval": ""
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 15,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            }
+          },
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 20,
+      "type": "timeseries",
+      "title": "Process count (top 10 groups)",
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 10,
+        "w": 6,
+        "x": 12,
+        "y": 43
+      },
+      "targets": [
+        {
+          "expr": "topk(10, namedprocess_namegroup_num_procs{job=\"perseus\"})",
+          "legendFormat": "{{groupname}}",
+          "refId": "A",
+          "datasource": "Prometheus",
+          "interval": ""
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 15,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            }
+          },
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 21,
+      "type": "timeseries",
+      "title": "Open file descriptors (top 10)",
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 10,
+        "w": 6,
+        "x": 18,
+        "y": 43
+      },
+      "targets": [
+        {
+          "expr": "topk(10, namedprocess_namegroup_open_filedesc{job=\"perseus\"})",
+          "legendFormat": "{{groupname}}",
+          "refId": "A",
+          "datasource": "Prometheus",
+          "interval": ""
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 15,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            }
+          },
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max",
+            "lastNotNull"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 22,
+      "type": "table",
+      "title": "Top processes by CPU now",
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 53
+      },
+      "targets": [
+        {
+          "expr": "topk(15, sum by (groupname) (rate(namedprocess_namegroup_cpu_seconds_total{job=\"perseus\"}[5m])))",
+          "format": "table",
+          "instant": true,
+          "refId": "A",
+          "datasource": "Prometheus"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "__name__": true,
+              "job": true,
+              "instance": true,
+              "host": true,
+              "exporter": true,
+              "monitor": true,
+              "memtype": true
+            },
+            "renameByName": {
+              "groupname": "Process",
+              "Value": "CPU cores"
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "CPU cores",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CPU cores"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "gauge",
+                  "mode": "basic"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true
+      }
+    },
+    {
+      "id": 23,
+      "type": "table",
+      "title": "Top processes by memory now",
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 53
+      },
+      "targets": [
+        {
+          "expr": "topk(15, namedprocess_namegroup_memory_bytes{job=\"perseus\",memtype=\"resident\"})",
+          "format": "table",
+          "instant": true,
+          "refId": "A",
+          "datasource": "Prometheus"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "__name__": true,
+              "job": true,
+              "instance": true,
+              "host": true,
+              "exporter": true,
+              "monitor": true,
+              "memtype": true
+            },
+            "renameByName": {
+              "groupname": "Process",
+              "Value": "Resident memory"
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Resident memory",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Resident memory"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "gauge",
+                  "mode": "basic"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true
+      }
+    },
+    {
+      "id": 24,
+      "type": "row",
+      "title": "Alerts",
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 63
+      },
+      "panels": []
+    },
+    {
+      "id": 25,
+      "type": "table",
+      "title": "Alerts",
+      "datasource": "Prometheus",
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 64
+      },
+      "targets": [
+        {
+          "expr": "ALERTS{alertname=~\"perseus_.*\"}",
+          "format": "table",
+          "instant": true,
+          "refId": "A",
+          "datasource": "Prometheus"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Value": true,
+              "__name__": true
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      }
+    }
+  ]
+}
