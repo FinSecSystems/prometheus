@@ -192,15 +192,15 @@ groups:
       severity: warning
     annotations:
       summary: "iperf3 to {{ $labels.server }} reaches only {{ $value | humanize }}bit/s"
-      description: "Weekly throughput test to the NAS from scripts/nic-iperf.sh. The ports are 2.5 Gbit/s; the NAS's own link or a busy NAS can also be the limit. The COMPUTRON test (a PC that is often off) has no alert; compare it in Grafana."
+      description: "Daily throughput test to the NAS from scripts/nic-iperf.sh. The ports are 2.5 Gbit/s; the NAS's own link or a busy NAS can also be the limit. The COMPUTRON test (a PC that is often off) has no alert; compare it in Grafana."
 
   - alert: nic_iperf_stale
-    expr: time() - nic_iperf_last_success_timestamp_seconds{server=~"nas2?"} > 9 * 86400 or absent(nic_iperf_last_success_timestamp_seconds{server=~"nas2?"})
+    expr: time() - nic_iperf_last_success_timestamp_seconds{server=~"nas2?"} > 3 * 86400 or absent(nic_iperf_last_success_timestamp_seconds{server=~"nas2?"})
     for: 1h
     labels:
       severity: warning
     annotations:
-      summary: "The weekly iperf3 throughput test to the NAS has not succeeded for 9 days"
+      summary: "The daily iperf3 throughput test to the NAS has not succeeded for 3 days"
       description: "Check the cron job of scripts/nic-iperf.sh, ~/nic-iperf.log and that the iperf3 server answers."
 
   # Internet speed (Speedtest Tracker, stack speedtest; scripts/speedtest-metrics.sh every 15 min, docs/speedtest.md)
