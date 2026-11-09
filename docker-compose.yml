@@ -367,6 +367,7 @@ services:
   influxdb:
     image: influxdb:1.11.8
     container_name: prometheus-influxdb
+    mem_limit: 2g                      # with the tsi1 index it uses about 150 MB; the old in-memory index needed 9 GB
     ports:
       - '${SERVER_IP}:8086:8086'
     env_file:
