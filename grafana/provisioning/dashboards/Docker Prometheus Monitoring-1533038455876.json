@@ -889,6 +889,545 @@
     },
     {
       "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 23
+      },
+      "id": 32,
+      "panels": [],
+      "title": "Hardware (temperatures and fans, limits from the chips; alerts hardware_*, cpu_temp_tjmax, gpu_fan_*)",
+      "type": "row"
+    },
+    {
+      "datasource": "Prometheus",
+      "id": 33,
+      "title": "CPU temperature",
+      "type": "gauge",
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 0,
+        "y": 24
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "min": 0,
+          "max": 100,
+          "decimals": 0,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 80
+              },
+              {
+                "color": "red",
+                "value": 95
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "targets": [
+        {
+          "expr": "node_hwmon_temp_celsius{chip=\"pci0000:00_0000:00:18_3\",host=\"\"}",
+          "refId": "A",
+          "instant": true
+        }
+      ]
+    },
+    {
+      "datasource": "Prometheus",
+      "id": 34,
+      "title": "GPU edge",
+      "type": "gauge",
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 4,
+        "y": 24
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "min": 0,
+          "max": 120,
+          "decimals": 0,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 90
+              },
+              {
+                "color": "red",
+                "value": 110
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "targets": [
+        {
+          "expr": "node_hwmon_temp_celsius{chip=\"0000:02:00_0_0000:03:00_0\",sensor=\"temp1\"}",
+          "refId": "A",
+          "instant": true
+        }
+      ]
+    },
+    {
+      "datasource": "Prometheus",
+      "id": 35,
+      "title": "GPU junction",
+      "type": "gauge",
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 8,
+        "y": 24
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "min": 0,
+          "max": 120,
+          "decimals": 0,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 95
+              },
+              {
+                "color": "red",
+                "value": 110
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "targets": [
+        {
+          "expr": "node_hwmon_temp_celsius{chip=\"0000:02:00_0_0000:03:00_0\",sensor=\"temp2\"}",
+          "refId": "A",
+          "instant": true
+        }
+      ]
+    },
+    {
+      "datasource": "Prometheus",
+      "id": 36,
+      "title": "GPU memory",
+      "type": "gauge",
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 12,
+        "y": 24
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "min": 0,
+          "max": 120,
+          "decimals": 0,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 95
+              },
+              {
+                "color": "red",
+                "value": 108
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "targets": [
+        {
+          "expr": "node_hwmon_temp_celsius{chip=\"0000:02:00_0_0000:03:00_0\",sensor=\"temp3\"}",
+          "refId": "A",
+          "instant": true
+        }
+      ]
+    },
+    {
+      "datasource": "Prometheus",
+      "id": 37,
+      "title": "NVMe (hottest)",
+      "type": "gauge",
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 16,
+        "y": 24
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "min": 0,
+          "max": 100,
+          "decimals": 0,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 85
+              },
+              {
+                "color": "red",
+                "value": 94.85
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "targets": [
+        {
+          "expr": "max(node_hwmon_temp_celsius{chip=~\"nvme_nvme.\",sensor=\"temp1\"})",
+          "refId": "A",
+          "instant": true
+        }
+      ]
+    },
+    {
+      "datasource": "Prometheus",
+      "id": 38,
+      "title": "GPU fan",
+      "type": "gauge",
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 20,
+        "y": 24
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "rotrpm",
+          "min": 0,
+          "max": 8000,
+          "decimals": 0,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 7000
+              },
+              {
+                "color": "red",
+                "value": 7600
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "targets": [
+        {
+          "expr": "node_hwmon_fan_rpm{chip=\"0000:02:00_0_0000:03:00_0\"}",
+          "refId": "A",
+          "instant": true
+        }
+      ]
+    },
+    {
+      "datasource": "Prometheus",
+      "id": 39,
+      "title": "Temperatures and limits",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 16,
+        "x": 0,
+        "y": 29
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*limit.*"
+            },
+            "properties": [
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    10
+                  ]
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "expr": "node_hwmon_temp_celsius{chip=\"pci0000:00_0000:00:18_3\",host=\"\"}",
+          "legendFormat": "CPU",
+          "refId": "A"
+        },
+        {
+          "expr": "node_hwmon_temp_celsius{chip=\"0000:02:00_0_0000:03:00_0\",sensor=\"temp1\"}",
+          "legendFormat": "GPU edge",
+          "refId": "B"
+        },
+        {
+          "expr": "node_hwmon_temp_celsius{chip=\"0000:02:00_0_0000:03:00_0\",sensor=\"temp2\"}",
+          "legendFormat": "GPU junction",
+          "refId": "C"
+        },
+        {
+          "expr": "node_hwmon_temp_celsius{chip=\"0000:02:00_0_0000:03:00_0\",sensor=\"temp3\"}",
+          "legendFormat": "GPU memory",
+          "refId": "D"
+        },
+        {
+          "expr": "node_hwmon_temp_celsius{chip=~\"nvme_nvme.\",sensor=\"temp1\"}",
+          "legendFormat": "NVMe {{chip}}",
+          "refId": "E"
+        },
+        {
+          "expr": "node_hwmon_temp_crit_celsius{chip=\"0000:02:00_0_0000:03:00_0\",sensor=\"temp2\"}",
+          "legendFormat": "GPU junction limit",
+          "refId": "F"
+        },
+        {
+          "expr": "vector(95)",
+          "legendFormat": "CPU Tjmax limit",
+          "refId": "G"
+        },
+        {
+          "expr": "max(node_hwmon_temp_crit_celsius{chip=~\"nvme_nvme.\"})",
+          "legendFormat": "NVMe limit",
+          "refId": "H"
+        }
+      ]
+    },
+    {
+      "datasource": "Prometheus",
+      "id": 40,
+      "title": "GPU fan speed",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 29
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "rotrpm",
+          "custom": {
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*limit.*"
+            },
+            "properties": [
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    10
+                  ]
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "expr": "node_hwmon_fan_rpm{chip=\"0000:02:00_0_0000:03:00_0\"}",
+          "legendFormat": "GPU fan",
+          "refId": "A"
+        },
+        {
+          "expr": "node_hwmon_fan_max_rpm{chip=\"0000:02:00_0_0000:03:00_0\"}",
+          "legendFormat": "fan max limit",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
       "datasource": null,
       "fieldConfig": {
         "defaults": {},
@@ -898,7 +1437,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 23
+        "y": 37
       },
       "id": 19,
       "panels": [],
@@ -922,7 +1461,7 @@
         "h": 14,
         "w": 6,
         "x": 0,
-        "y": 24
+        "y": 38
       },
       "hiddenSeries": false,
       "id": 3,
@@ -1026,7 +1565,7 @@
         "h": 14,
         "w": 6,
         "x": 6,
-        "y": 24
+        "y": 38
       },
       "hiddenSeries": false,
       "id": 2,
@@ -1130,7 +1669,7 @@
         "h": 14,
         "w": 6,
         "x": 12,
-        "y": 24
+        "y": 38
       },
       "hiddenSeries": false,
       "id": 9,
@@ -1233,7 +1772,7 @@
         "h": 14,
         "w": 6,
         "x": 18,
-        "y": 24
+        "y": 38
       },
       "hiddenSeries": false,
       "id": 8,
@@ -1328,7 +1867,7 @@
         "h": 2,
         "w": 24,
         "x": 0,
-        "y": 38
+        "y": 52
       },
       "id": 23,
       "links": [],
@@ -1383,7 +1922,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 40
+        "y": 54
       },
       "id": 30,
       "links": [],
@@ -1568,5 +2107,5 @@
   "timezone": "browser",
   "title": "Docker Prometheus Monitoring",
   "uid": "64nrElFmk",
-  "version": 70
+  "version": 71
 }
