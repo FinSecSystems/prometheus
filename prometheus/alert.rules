@@ -487,6 +487,113 @@ groups:
       summary: "perseus process {{ $labels.groupname }} holds {{ $value | humanize1024 }}B resident memory"
       description: "A single process group is holding more than 4 GB of the 16 GB RAM on perseus."
 
+  # router2 (pfSense, CARP backup of router1): node_exporter package (job router2), ping through the blackbox exporter (job router_icmp) and scripts/router-metrics.sh
+  # (router_*{host="router2"}, textfile). It lost power abruptly many times (SMART Power-Off_Retract_Count 60 of 66 power cycles on 2026-11-13).
+  - alert: router2_unreachable
+    expr: probe_success{job="router_icmp",host="router2"} == 0
+    for: 3m
+    labels:
+      severity: warning
+    annotations:
+      summary: "router2 does not answer ping"
+      description: "router2 (192.168.2.254) is off or unreachable. It is the CARP backup, so nothing else breaks while router1 is up; check its power supply (docs/monitoring.md, router2)."
+
+  - alert: router2_rebooted
+    expr: changes(node_boot_time_seconds{job="router2"}[15m]) > 0
+    labels:
+      severity: warning
+    annotations:
+      summary: "router2 rebooted"
+      description: "router2's boot time changed in the last 15 minutes. If router_smart_unsafe_poweroff_count also rose it was a power loss (alert router2_unsafe_poweroff), otherwise a clean reboot or a panic."
+
+  - alert: router2_unsafe_poweroff
+    expr: increase(router_smart_unsafe_poweroff_count{host="router2"}[1h]) > 0
+    labels:
+      severity: warning
+    annotations:
+      summary: "router2 lost power abruptly (SMART unsafe power-off counter rose)"
+      description: "The system SSD's Power-Off_Retract_Count rose, so power to the router was cut without a shutdown. Check its power brick, plug, outlet or strip, and consider a UPS."
+
+  - alert: router2_exporter_down
+    expr: up{job="router2"} == 0
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "router2 node_exporter does not answer"
+      description: "Check Services > Prometheus node_exporter on router2 (enabled, listen on LAN, port 9100) and that the LAN rule allows TCP 9100 from 192.168.2.69. Ping is a separate probe (router2_unreachable)."
+
+  - alert: router2_metrics_stale
+    expr: router_metrics_ok{host="router2"} == 0 or time() - router_metrics_last_success_timestamp_seconds{host="router2"} > 600 or absent(router_metrics_ok{host="router2"})
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "scripts/router-metrics.sh cannot read router2 over SSH"
+      description: "The SMART, pf, gateway and process metrics of router2 are not updating. Check the ubuntu cron job, 'ssh admin@router2 true' and ~/data/.../textfile/router_router2.prom."
+
+  - alert: router2_smart_failing
+    expr: router_smart_health_ok{host="router2"} == 0 or router_smart_reallocated_sectors{host="router2"} > 0
+    labels:
+      severity: warning
+    annotations:
+      summary: "router2 system SSD reports SMART problems"
+      description: "Health test failed or sectors were reallocated: smartctl -a /dev/ada0 on router2. Replace the mSATA SSD and restore the pfSense config (Diagnostics > Backup)."
+
+  - alert: router2_high_temperature
+    expr: max(router_temperature_celsius{host="router2"}) > 75 or router_smart_temperature_celsius{host="router2"} > 65
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "router2 temperature above the limit"
+      description: "A thermal zone is above 75 C or the SSD above 65 C. Check the fan and airflow."
+
+  - alert: router2_high_cpu
+    expr: 1 - avg(rate(node_cpu_seconds_total{job="router2",mode="idle"}[5m])) > 0.85
+    for: 30m
+    labels:
+      severity: warning
+    annotations:
+      summary: "router2 CPU above 85% for 30 minutes"
+      description: "See the top processes in the Router2 Monitoring dashboard (router_process_cpu_percent)."
+
+  - alert: router2_low_memory
+    expr: (node_memory_free_bytes{job="router2"} + node_memory_inactive_bytes{job="router2"} + node_memory_cache_bytes{job="router2"}) / node_memory_size_bytes{job="router2"} < 0.10
+    for: 30m
+    labels:
+      severity: warning
+    annotations:
+      summary: "router2 has less than 10% memory free, inactive or cached"
+      description: "FreeBSD has no MemAvailable: free + inactive + cache is used (ZFS ARC counts as wired). See router_process_rss_bytes in the Router2 Monitoring dashboard (snort and ntopng are the big ones)."
+
+  - alert: router2_disk_filling
+    expr: 1 - node_filesystem_avail_bytes{job="router2",mountpoint="/"} / node_filesystem_size_bytes{job="router2",mountpoint="/"} > 0.90
+    for: 30m
+    labels:
+      severity: warning
+    annotations:
+      summary: "router2 root filesystem above 90%"
+      description: "The 119 GB pool is filling up (logs, snort, ntopng data); see du on router2."
+
+  - alert: router2_gateway_loss
+    expr: router_gateway_loss_ratio{host="router2"} > 0.20
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "router2 gateway {{ $labels.gateway }} loses {{ $value | humanizePercentage }} of its pings"
+      description: "dpinger loss on router2 for this gateway (WAN, 4G or an OpenVPN tunnel); the 4G gateway often shows 5-21% for a minute."
+
+  - alert: router2_became_carp_master
+    expr: max(router_carp_master{host="router2"}) == 1
+    for: 2m
+    labels:
+      severity: page
+    annotations:
+      summary: "router2 is CARP MASTER: router1 is not serving"
+      description: "router2 is meant to be the backup. It took over, so router1 is down or demoted; check router1 (ssh router1)."
+
   # Hardware temperatures and fans (node-exporter hwmon; limits are the ones the chips report themselves, see docs/monitoring.md).
   # The chip ids: nvme_nvme*, pci0000:00_0000:00:18_3 = Ryzen CPU (k10temp), 0000:02:00_0_0000:03:00_0 = Radeon AI PRO R9700, platform_f71882fg_2592 = perseus board.
   - alert: hardware_temp_critical

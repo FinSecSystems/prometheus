@@ -74,6 +74,32 @@ scrape_configs:
     - targets: ['192.168.2.8:9256']
       labels: {host: perseus, exporter: process}
 
+  # router2 (pfSense, CARP backup of router1, 192.168.2.254): the pfSense package node_exporter (System > Package Manager, Services > Prometheus node_exporter,
+  # listen on LAN :9100, collectors boottime cpu devstat exec filesystem loadavg meminfo netdev textfile time). SMART, pf, gateways and processes come from
+  # scripts/router-metrics.sh as router_*{host="router2"} (docs/monitoring.md).
+  - job_name: 'router2'
+    scrape_interval: 30s
+    static_configs:
+    - targets: ['192.168.2.254:9100']
+      labels: {host: router2, exporter: node}
+
+  # Ping of router2 every 15 s through the blackbox exporter (module icmp): shows when it is off, which node_exporter alone cannot (alert router2_unreachable).
+  - job_name: 'router_icmp'
+    scrape_interval: 15s
+    metrics_path: /probe
+    params:
+      module: [icmp]
+    static_configs:
+    - targets: ['192.168.2.254']
+      labels: {host: router2}
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: prometheus-blackbox-exporter:9115
+
   # Database and Redis exporters (issue #18, docs/monitoring.md): one exporter per kind, the target goes in as a URL parameter.
   # Keep the target lists in sync with PG / MYSQL / REDIS_AUTH in ../exporters-init.sh.
   - job_name: 'redis'
