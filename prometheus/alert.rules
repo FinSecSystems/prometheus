@@ -486,3 +486,51 @@ groups:
     annotations:
       summary: "perseus process {{ $labels.groupname }} holds {{ $value | humanize1024 }}B resident memory"
       description: "A single process group is holding more than 4 GB of the 16 GB RAM on perseus."
+
+  # Hardware temperatures and fans (node-exporter hwmon; limits are the ones the chips report themselves, see docs/monitoring.md).
+  # The chip ids: nvme_nvme*, pci0000:00_0000:00:18_3 = Ryzen CPU (k10temp), 0000:02:00_0_0000:03:00_0 = Radeon AI PRO R9700, platform_f71882fg_2592 = perseus board.
+  - alert: hardware_temp_critical
+    expr: node_hwmon_temp_celsius >= on(instance, chip, sensor) node_hwmon_temp_crit_celsius
+    for: 2m
+    labels:
+      severity: page
+    annotations:
+      summary: "{{ $labels.instance }} {{ $labels.chip }}/{{ $labels.sensor }} at {{ $value | printf \"%.0f\" }} C, above its critical limit"
+      description: "The sensor reports a temperature at or above the critical limit of the chip (the hardware throttles or shuts down). Check fans and airflow."
+
+  - alert: hardware_temp_high
+    expr: node_hwmon_temp_celsius >= on(instance, chip, sensor) (node_hwmon_temp_max_celsius < 1000)
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "{{ $labels.instance }} {{ $labels.chip }}/{{ $labels.sensor }} at {{ $value | printf \"%.0f\" }} C, above its maximum"
+      description: "The temperature has been above the maximum the chip reports (NVMe warning temperature, CPU/board max) for 10 minutes."
+
+  # The Ryzen 7 5700G on this host reports no limit; AMD specifies Tjmax 95 C.
+  - alert: cpu_temp_tjmax
+    expr: node_hwmon_temp_celsius{chip="pci0000:00_0000:00:18_3", host=""} >= 95
+    for: 2m
+    labels:
+      severity: page
+    annotations:
+      summary: "CPU of {{ $labels.instance }} at {{ $value | printf \"%.0f\" }} C (Tjmax 95 C)"
+      description: "The Ryzen 7 5700G reached its maximum junction temperature (AMD specification 95 C) and throttles."
+
+  - alert: gpu_fan_at_max
+    expr: node_hwmon_fan_rpm >= on(instance, chip, sensor) (node_hwmon_fan_max_rpm * 0.95)
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "GPU fan of {{ $labels.instance }} at {{ $value | printf \"%.0f\" }} RPM, at its maximum"
+      description: "The fan has been at 95% of its rated maximum speed for 5 minutes: the card cannot shed its heat."
+
+  - alert: gpu_fan_stopped_hot
+    expr: node_hwmon_fan_rpm{chip="0000:02:00_0_0000:03:00_0"} == 0 and on(instance, chip) node_hwmon_temp_celsius{chip="0000:02:00_0_0000:03:00_0", sensor="temp1"} > 70
+    for: 3m
+    labels:
+      severity: page
+    annotations:
+      summary: "GPU fan of {{ $labels.instance }} stopped while the card is above 70 C"
+      description: "The fan reports 0 RPM with the edge temperature above 70 C (the zero-RPM idle mode only applies when cool): the fan has failed or is blocked."
