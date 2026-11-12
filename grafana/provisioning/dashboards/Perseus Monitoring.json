@@ -327,7 +327,7 @@
       },
       "targets": [
         {
-          "expr": "node_load1{job=\"perseus\"} / count(node_cpu_seconds_total{job=\"perseus\",mode=\"idle\"})",
+          "expr": "node_load1{job=\"perseus\"} / on() count(node_cpu_seconds_total{job=\"perseus\",mode=\"idle\"})",
           "legendFormat": "",
           "refId": "A",
           "datasource": "Prometheus",

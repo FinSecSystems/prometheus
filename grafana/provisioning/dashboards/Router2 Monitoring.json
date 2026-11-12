@@ -654,7 +654,7 @@
       },
       "targets": [
         {
-          "expr": "node_load1{job=\"router2\"} / count(node_cpu_seconds_total{job=\"router2\",mode=\"idle\"})",
+          "expr": "node_load1{job=\"router2\"} / on() count(node_cpu_seconds_total{job=\"router2\",mode=\"idle\"})",
           "legendFormat": "",
           "refId": "A",
           "datasource": "Prometheus",
