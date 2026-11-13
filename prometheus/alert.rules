@@ -594,6 +594,112 @@ groups:
       summary: "router2 is CARP MASTER: router1 is not serving"
       description: "router2 is meant to be the backup. It took over, so router1 is down or demoted; check router1 (ssh router1)."
 
+  # router1 (pfSense, CARP MASTER, 192.168.2.253): node_exporter package (job router1), ping (job router_icmp), scripts/router-metrics.sh (router_*{host="router1"}). Its NVMe system disk is worn out (SMART FAILED, 182% used, 1329 of 1417 power cycles unsafe on 2026-11-13).
+  - alert: router1_unreachable
+    expr: probe_success{job="router_icmp",host="router1"} == 0
+    for: 3m
+    labels:
+      severity: page
+    annotations:
+      summary: "router1 does not answer ping"
+      description: "router1 (192.168.2.253) is off or unreachable. It is the CARP backup, so nothing else breaks while router1 is up; check its power supply (docs/monitoring.md, router1)."
+
+  - alert: router1_rebooted
+    expr: changes(node_boot_time_seconds{job="router1"}[15m]) > 0
+    labels:
+      severity: warning
+    annotations:
+      summary: "router1 rebooted"
+      description: "router1's boot time changed in the last 15 minutes. If router_smart_unsafe_poweroff_count also rose it was a power loss (alert router1_unsafe_poweroff), otherwise a clean reboot or a panic."
+
+  - alert: router1_unsafe_poweroff
+    expr: increase(router_smart_unsafe_poweroff_count{host="router1"}[1h]) > 0
+    labels:
+      severity: warning
+    annotations:
+      summary: "router1 lost power abruptly (SMART unsafe power-off counter rose)"
+      description: "The system SSD's Power-Off_Retract_Count rose, so power to the router was cut without a shutdown. Check its power brick, plug, outlet or strip, and consider a UPS."
+
+  - alert: router1_exporter_down
+    expr: up{job="router1"} == 0
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "router1 node_exporter does not answer"
+      description: "Check Services > Prometheus node_exporter on router1 (enabled, listen on LAN, port 9100) and that the LAN rule allows TCP 9100 from 192.168.2.69. Ping is a separate probe (router1_unreachable)."
+
+  - alert: router1_metrics_stale
+    expr: router_metrics_ok{host="router1"} == 0 or time() - router_metrics_last_success_timestamp_seconds{host="router1"} > 600 or absent(router_metrics_ok{host="router1"})
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "scripts/router-metrics.sh cannot read router1 over SSH"
+      description: "The SMART, pf, gateway and process metrics of router1 are not updating. Check the ubuntu cron job, 'ssh admin@router1 true' and ~/data/.../textfile/router_router1.prom."
+
+  - alert: router1_smart_failing
+    expr: router_smart_health_ok{host="router1"} == 0 or router_smart_critical_warning{host="router1"} > 0 or router_smart_media_errors{host="router1"} > 0 or router_smart_percentage_used{host="router1"} > 100
+    labels:
+      severity: page
+    annotations:
+      summary: "router1 NVMe system disk is failing or worn out (SMART)"
+      description: "smartctl -a /dev/nvme0 on router1: critical warning, failed health test, media errors or more than 100% of the rated endurance used. Back up the pfSense config (Diagnostics > Backup) and replace the disk; router2 holds a synced copy."
+
+  - alert: router1_high_temperature
+    expr: max(router_temperature_celsius{host="router1"}) > 75 or router_smart_temperature_celsius{host="router1"} > 70
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "router1 temperature above the limit"
+      description: "A thermal zone is above 75 C or the NVMe above its 70 C warning threshold. Check the fan and airflow."
+
+  - alert: router1_high_cpu
+    expr: 1 - avg(rate(node_cpu_seconds_total{job="router1",mode="idle"}[5m])) > 0.85
+    for: 30m
+    labels:
+      severity: warning
+    annotations:
+      summary: "router1 CPU above 85% for 30 minutes"
+      description: "See the top processes in the Router2 Monitoring dashboard (router_process_cpu_percent)."
+
+  - alert: router1_low_memory
+    expr: (node_memory_free_bytes{job="router1"} + node_memory_inactive_bytes{job="router1"} + node_memory_cache_bytes{job="router1"}) / node_memory_size_bytes{job="router1"} < 0.10
+    for: 30m
+    labels:
+      severity: warning
+    annotations:
+      summary: "router1 has less than 10% memory free, inactive or cached"
+      description: "FreeBSD has no MemAvailable: free + inactive + cache is used (ZFS ARC counts as wired). See router_process_rss_bytes in the Router2 Monitoring dashboard (snort and ntopng are the big ones)."
+
+  - alert: router1_disk_filling
+    expr: 1 - node_filesystem_avail_bytes{job="router1",mountpoint="/"} / node_filesystem_size_bytes{job="router1",mountpoint="/"} > 0.90
+    for: 30m
+    labels:
+      severity: warning
+    annotations:
+      summary: "router1 root filesystem above 90%"
+      description: "The pool is filling up (logs, snort, ntopng data); see du on router1."
+
+  - alert: router1_gateway_loss
+    expr: router_gateway_loss_ratio{host="router1"} > 0.20
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "router1 gateway {{ $labels.gateway }} loses {{ $value | humanizePercentage }} of its pings"
+      description: "dpinger loss on router1 for this gateway (WAN, 4G or an OpenVPN tunnel); the 4G gateway often shows 5-21% for a minute."
+
+  - alert: router1_not_carp_master
+    expr: max(router_carp_master{host="router1"}) == 0
+    for: 2m
+    labels:
+      severity: page
+    annotations:
+      summary: "router1 is not CARP MASTER: router2 is serving (or nobody is)"
+      description: "router1 is meant to be the master. It was demoted or lost its interfaces; check ssh router1 and ifconfig | grep carp, and whether router2 took over (alert router2_became_carp_master)."
+
   # Hardware temperatures and fans (node-exporter hwmon; limits are the ones the chips report themselves, see docs/monitoring.md).
   # The chip ids: nvme_nvme*, pci0000:00_0000:00:18_3 = Ryzen CPU (k10temp), 0000:02:00_0_0000:03:00_0 = Radeon AI PRO R9700, platform_f71882fg_2592 = perseus board.
   - alert: hardware_temp_critical

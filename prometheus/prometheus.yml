@@ -77,19 +77,28 @@ scrape_configs:
   # router2 (pfSense, CARP backup of router1, 192.168.2.254): the pfSense package node_exporter (System > Package Manager, Services > Prometheus node_exporter,
   # listen on LAN :9100, collectors boottime cpu devstat exec filesystem loadavg meminfo netdev textfile time). SMART, pf, gateways and processes come from
   # scripts/router-metrics.sh as router_*{host="router2"} (docs/monitoring.md).
+  # router1 (pfSense, CARP master, 192.168.2.253): same package and collectors as router2
+  - job_name: 'router1'
+    scrape_interval: 30s
+    static_configs:
+    - targets: ['192.168.2.253:9100']
+      labels: {host: router1, exporter: node}
+
   - job_name: 'router2'
     scrape_interval: 30s
     static_configs:
     - targets: ['192.168.2.254:9100']
       labels: {host: router2, exporter: node}
 
-  # Ping of router2 every 15 s through the blackbox exporter (module icmp): shows when it is off, which node_exporter alone cannot (alert router2_unreachable).
+  # Ping of router1 and router2 every 15 s through the blackbox exporter (module icmp): shows when one is off, which node_exporter alone cannot (alerts router1_unreachable, router2_unreachable).
   - job_name: 'router_icmp'
     scrape_interval: 15s
     metrics_path: /probe
     params:
       module: [icmp]
     static_configs:
+    - targets: ['192.168.2.253']
+      labels: {host: router1}
     - targets: ['192.168.2.254']
       labels: {host: router2}
     relabel_configs:
