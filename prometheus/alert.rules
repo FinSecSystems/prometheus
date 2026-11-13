@@ -700,6 +700,16 @@ groups:
       summary: "router1 is not CARP MASTER: router2 is serving (or nobody is)"
       description: "router1 is meant to be the master. It was demoted or lost its interfaces; check ssh router1 and ifconfig | grep carp, and whether router2 took over (alert router2_became_carp_master)."
 
+  # pfSense config backup (scripts/router-config-backup.sh, ubuntu cron daily 03:40, copies in ~/router-backups/<router>/, docs/backups.md). router2 is not covered yet (GitHub issue).
+  - alert: router_config_backup_stale
+    expr: time() - router_config_backup_last_success_timestamp_seconds{host="router1"} > 129600 or router_config_backup_ok{host="router1"} == 0 or absent(router_config_backup_last_success_timestamp_seconds{host="router1"})
+    for: 1h
+    labels:
+      severity: warning
+    annotations:
+      summary: "no successful pfSense config backup of router1 for 36 hours"
+      description: "scripts/router-config-backup.sh could not copy router1's /conf/config.xml (router down, key removed, hash or XML check failed). See ~/router-config-backup.log. router1's NVMe is failing, so this backup is the recovery path."
+
   # Hardware temperatures and fans (node-exporter hwmon; limits are the ones the chips report themselves, see docs/monitoring.md).
   # The chip ids: nvme_nvme*, pci0000:00_0000:00:18_3 = Ryzen CPU (k10temp), 0000:02:00_0_0000:03:00_0 = Radeon AI PRO R9700, platform_f71882fg_2592 = perseus board.
   - alert: hardware_temp_critical
