@@ -556,7 +556,7 @@ groups:
       severity: warning
     annotations:
       summary: "router2 CPU above 85% for 30 minutes"
-      description: "See the top processes in the Router2 Monitoring dashboard (router_process_cpu_percent)."
+      description: "See the top processes in the Router1 + Router2 Monitoring dashboard (router_process_cpu_percent)."
 
   - alert: router2_low_memory
     expr: (node_memory_free_bytes{job="router2"} + node_memory_inactive_bytes{job="router2"} + node_memory_cache_bytes{job="router2"}) / node_memory_size_bytes{job="router2"} < 0.10
@@ -565,7 +565,7 @@ groups:
       severity: warning
     annotations:
       summary: "router2 has less than 10% memory free, inactive or cached"
-      description: "FreeBSD has no MemAvailable: free + inactive + cache is used (ZFS ARC counts as wired). See router_process_rss_bytes in the Router2 Monitoring dashboard (snort and ntopng are the big ones)."
+      description: "FreeBSD has no MemAvailable: free + inactive + cache is used (ZFS ARC counts as wired). See router_process_rss_bytes in the Router1 + Router2 Monitoring dashboard (snort and ntopng are the big ones)."
 
   - alert: router2_disk_filling
     expr: 1 - node_filesystem_avail_bytes{job="router2",mountpoint="/"} / node_filesystem_size_bytes{job="router2",mountpoint="/"} > 0.90
@@ -662,7 +662,7 @@ groups:
       severity: warning
     annotations:
       summary: "router1 CPU above 85% for 30 minutes"
-      description: "See the top processes in the Router2 Monitoring dashboard (router_process_cpu_percent)."
+      description: "See the top processes in the Router1 + Router2 Monitoring dashboard (router_process_cpu_percent)."
 
   - alert: router1_low_memory
     expr: (node_memory_free_bytes{job="router1"} + node_memory_inactive_bytes{job="router1"} + node_memory_cache_bytes{job="router1"}) / node_memory_size_bytes{job="router1"} < 0.10
@@ -671,7 +671,7 @@ groups:
       severity: warning
     annotations:
       summary: "router1 has less than 10% memory free, inactive or cached"
-      description: "FreeBSD has no MemAvailable: free + inactive + cache is used (ZFS ARC counts as wired). See router_process_rss_bytes in the Router2 Monitoring dashboard (snort and ntopng are the big ones)."
+      description: "FreeBSD has no MemAvailable: free + inactive + cache is used (ZFS ARC counts as wired). See router_process_rss_bytes in the Router1 + Router2 Monitoring dashboard (snort and ntopng are the big ones)."
 
   - alert: router1_disk_filling
     expr: 1 - node_filesystem_avail_bytes{job="router1",mountpoint="/"} / node_filesystem_size_bytes{job="router1",mountpoint="/"} > 0.90
