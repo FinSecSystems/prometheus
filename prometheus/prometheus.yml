@@ -321,6 +321,7 @@ scrape_configs:
         - https://code.finsec.localdomain        
 #auth
         - https://auth.finsec.localdomain
+        - https://auth.finsec.localdomain/.well-known/openid-configuration   # OIDC discovery: all SSO logins fail if this is down
 #garage
         - https://storage.finsec.localdomain/health
 #windows

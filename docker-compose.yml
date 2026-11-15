@@ -158,6 +158,7 @@ services:
       - ./grafana/provisioning/:/etc/grafana/provisioning:rw
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini
       - ./grafana/ldap.toml:/etc/grafana/ldap.toml
+      - ${DATA_DIR}/certs/ca.crt:/etc/grafana/ca.crt:ro   # internal CA, for the Authelia OIDC login (auth.finsec.localdomain)
     environment:
       # Grafana 13 downloads its core plugins (prometheus, influxdb, ...) into /var/lib/grafana/plugins at start; that is the NFS share
       # ($DATA_DIR is noexec), so their backends fail with "permission denied" and every panel shows N/A. Use the bundled ones.
