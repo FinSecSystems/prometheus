@@ -328,6 +328,8 @@ scrape_configs:
         - https://windows.finsec.localdomain
 #llm
         - https://llm.finsec.localdomain/v1/models
+#mtv
+        - https://mtv.finsec.localdomain/health
 #paperless
         - https://docs.finsec.localdomain        
 #menu
