@@ -722,13 +722,24 @@ groups:
       description: "The sensor reports a temperature at or above the critical limit of the chip (the hardware throttles or shuts down). Check fans and airflow."
 
   - alert: hardware_temp_high
-    expr: node_hwmon_temp_celsius >= on(instance, chip, sensor) (node_hwmon_temp_max_celsius < 1000)
+    expr: (node_hwmon_temp_celsius >= on(instance, chip, sensor) (node_hwmon_temp_max_celsius < 1000))
+      unless on(instance, chip) node_hwmon_temp_celsius{instance="192.168.2.8:9100", chip="pci0000:00_0000:00:18_3"}
     for: 10m
     labels:
       severity: warning
     annotations:
       summary: "{{ $labels.instance }} {{ $labels.chip }}/{{ $labels.sensor }} at {{ $value | printf \"%.0f\" }} C, above its maximum"
       description: "The temperature has been above the maximum the chip reports (NVMe warning temperature, CPU/board max) for 10 minutes."
+
+  # The perseus NAS CPU reports a 70 C maximum but runs at 65-75 C under normal load; warn from 85 C instead.
+  - alert: perseus_cpu_temp_high
+    expr: node_hwmon_temp_celsius{instance="192.168.2.8:9100", chip="pci0000:00_0000:00:18_3"} >= 85
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "perseus CPU at {{ $value | printf \"%.0f\" }} C, above 85 C"
+      description: "The perseus NAS CPU has been above 85 C for 10 minutes (the chip's own 70 C maximum is ignored, normal load is 65-75 C). Check fans and airflow."
 
   # The Ryzen 7 5700G on this host reports no limit; AMD specifies Tjmax 95 C.
   - alert: cpu_temp_tjmax
