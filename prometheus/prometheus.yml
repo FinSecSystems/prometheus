@@ -74,6 +74,14 @@ scrape_configs:
     - targets: ['192.168.2.8:9256']
       labels: {host: perseus, exporter: process}
 
+  # providence NAS (QNAP TS-259, QTS 4.2.6, 32-bit, 192.168.2.11, ssh providence): static node_exporter 1.13.0 (linux-386) in /share/MD0_DATA/monitoring,
+  # started every minute by /etc/config/crontab (start.sh); the same folder holds an iperf3 server on :5201 (docs/monitoring.md)
+  - job_name: 'providence'
+    scrape_interval: 30s
+    static_configs:
+    - targets: ['192.168.2.11:9100']
+      labels: {host: providence, exporter: node}
+
   # router2 (pfSense, CARP backup of router1, 192.168.2.254): the pfSense package node_exporter (System > Package Manager, Services > Prometheus node_exporter,
   # listen on LAN :9100, collectors boottime cpu devstat exec filesystem loadavg meminfo netdev textfile time). SMART, pf, gateways and processes come from
   # scripts/router-metrics.sh as router_*{host="router2"} (docs/monitoring.md).

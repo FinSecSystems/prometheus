@@ -42,7 +42,8 @@ groups:
 
   - alert: low_disk_space
     # perseus (QNAP): /mnt/ext on md13 is the NAS's 417 MB system partition (93% full by design), not user data
-    expr: node_filesystem_free_bytes/node_filesystem_size_bytes*100 < 10 unless on(instance, mountpoint) node_filesystem_size_bytes{instance="192.168.2.8:9100", mountpoint="/mnt/ext"}
+    # providence (QNAP TS-259): the same for /mnt/ext (sda4) and / (128 MB root ramdisk)
+    expr: node_filesystem_free_bytes/node_filesystem_size_bytes*100 < 10 unless on(instance, mountpoint) node_filesystem_size_bytes{instance="192.168.2.8:9100", mountpoint="/mnt/ext"} unless on(instance, mountpoint) node_filesystem_size_bytes{instance="192.168.2.11:9100", mountpoint=~"/|/mnt/ext"}
     for: 5m
     labels:
       severity: page
@@ -173,7 +174,8 @@ groups:
       description: "The cable or the switch port of {{ $labels.device }} is down."
 
   - alert: nic_link_speed_low
-    expr: node_network_speed_bytes{device=~"eth[12]"} > 0 and node_network_speed_bytes{device=~"eth[12]"} < 3.125e8
+    # providence (TS-259) has 1 Gbit ports only
+    expr: node_network_speed_bytes{device=~"eth[12]",instance!="192.168.2.11:9100"} > 0 and node_network_speed_bytes{device=~"eth[12]",instance!="192.168.2.11:9100"} < 3.125e8
     for: 10m
     labels:
       severity: warning
@@ -396,7 +398,7 @@ groups:
   # Disk: low_disk_space above fires at 10% free; these two give an earlier warning and a trend
   - alert: disk_usage_high
     # perseus (QNAP): /mnt/ext (md13, 417 MB system partition) is excluded, the data volumes are still checked
-    expr: (1 - node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs|ramfs|nsfs"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay|squashfs|ramfs|nsfs"}) * 100 > 85 unless on(instance, mountpoint) node_filesystem_size_bytes{instance="192.168.2.8:9100", mountpoint="/mnt/ext"}
+    expr: (1 - node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs|ramfs|nsfs"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay|squashfs|ramfs|nsfs"}) * 100 > 85 unless on(instance, mountpoint) node_filesystem_size_bytes{instance="192.168.2.8:9100", mountpoint="/mnt/ext"} unless on(instance, mountpoint) node_filesystem_size_bytes{instance="192.168.2.11:9100", mountpoint=~"/|/mnt/ext"}
     for: 30m
     labels:
       severity: warning
@@ -405,7 +407,7 @@ groups:
       description: "More than 85% used for 30 minutes. Old images (docker image prune), rollback copies (scripts/*cleanup*.sh) and logs are the usual candidates."
 
   - alert: disk_filling_up
-    expr: predict_linear(node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs|ramfs|nsfs"}[6h], 4 * 86400) < 0 and node_filesystem_avail_bytes / node_filesystem_size_bytes < 0.4
+    expr: predict_linear(node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs|ramfs|nsfs"}[6h], 4 * 86400) < 0 and node_filesystem_avail_bytes / node_filesystem_size_bytes < 0.4 unless on(instance, mountpoint) node_filesystem_size_bytes{instance="192.168.2.11:9100", mountpoint=~"/|/mnt/ext"}
     for: 1h
     labels:
       severity: warning
@@ -450,6 +452,15 @@ groups:
     annotations:
       summary: "perseus {{ $labels.exporter }} exporter down"
       description: "Check the perseus-node-exporter / perseus-process-exporter containers in Container Station (ssh perseus, docker ps)."
+
+  - alert: providence_exporter_down
+    expr: up{job="providence"} == 0
+    for: 15m
+    labels:
+      severity: warning
+    annotations:
+      summary: "providence node_exporter down"
+      description: "ssh providence; /share/MD0_DATA/monitoring/start.sh starts it (cron entry in /etc/config/crontab runs it every minute)."
 
   - alert: perseus_high_cpu
     expr: 1 - avg(rate(node_cpu_seconds_total{job="perseus",mode="idle"}[5m])) > 0.85
