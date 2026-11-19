@@ -733,8 +733,10 @@ groups:
       description: "The sensor reports a temperature at or above the critical limit of the chip (the hardware throttles or shuts down). Check fans and airflow."
 
   - alert: hardware_temp_high
+    # providence: the it87 chip reports meaningless max limits (-70, -27, -7 C); its coretemp sensors have real ones (crit 100 C)
     expr: (node_hwmon_temp_celsius >= on(instance, chip, sensor) (node_hwmon_temp_max_celsius < 1000))
       unless on(instance, chip) node_hwmon_temp_celsius{instance="192.168.2.8:9100", chip="pci0000:00_0000:00:18_3"}
+      unless on(instance, chip) node_hwmon_temp_celsius{instance="192.168.2.11:9100", chip="platform_it87_2576"}
     for: 10m
     labels:
       severity: warning
