@@ -368,3 +368,35 @@ scrape_configs:
       - target_label: __address__
         replacement: prometheus-blackbox-exporter:9115  # The blackbox exporter's real hostname:port.
 
+  # DNS resolution time: the blackbox dns prober asks each resolver for an internal name and for a public name every 30 s
+  # (probe_duration_seconds, alerts dns_slow / dns_probe_failed). Targets: operations-dns (bind, 172.34.0.4), the pfSense
+  # resolver on router1 (192.168.2.1, what the containers and LAN clients use) and 1.1.1.1 as an upstream reference.
+  - job_name: 'dns_internal'
+    scrape_interval: 30s
+    metrics_path: /probe
+    params:
+      module: [dns_internal]
+    static_configs:
+      - targets: ['172.34.0.4', '192.168.2.1']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: prometheus-blackbox-exporter:9115
+
+  - job_name: 'dns_public'
+    scrape_interval: 30s
+    metrics_path: /probe
+    params:
+      module: [dns_public]
+    static_configs:
+      - targets: ['172.34.0.4', '192.168.2.1', '1.1.1.1']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: prometheus-blackbox-exporter:9115

@@ -37,3 +37,22 @@ modules:
       - expect: "^:[^ ]+ 001"
   icmp:
     prober: icmp
+  # DNS resolution timing (jobs dns_internal and dns_public in prometheus.yml; alerts dns_*)
+  dns_internal:
+    prober: dns
+    timeout: 5s
+    dns:
+      preferred_ip_protocol: "ip4"
+      transport_protocol: "udp"
+      query_name: "dns.finsec.localdomain"
+      query_type: "A"
+      valid_rcodes: [NOERROR]
+  dns_public:
+    prober: dns
+    timeout: 5s
+    dns:
+      preferred_ip_protocol: "ip4"
+      transport_protocol: "udp"
+      query_name: "finsec.systems"
+      query_type: "A"
+      valid_rcodes: [NOERROR]

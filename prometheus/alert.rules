@@ -781,3 +781,23 @@ groups:
     annotations:
       summary: "GPU fan of {{ $labels.instance }} stopped while the card is above 70 C"
       description: "The fan reports 0 RPM with the edge temperature above 70 C (the zero-RPM idle mode only applies when cool): the fan has failed or is blocked."
+
+  # DNS resolution time (blackbox dns prober, jobs dns_internal / dns_public)
+  - alert: dns_slow
+    expr: probe_duration_seconds{job=~"dns_internal|dns_public"} > 0.5 and probe_success{job=~"dns_internal|dns_public"} == 1
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "DNS via {{ $labels.instance }} ({{ $labels.job }}) takes {{ $value | printf \"%.2f\" }} s"
+      description: "Resolving the {{ $labels.job }} test name through {{ $labels.instance }} has taken more than 0.5 s for 5 minutes (normal: a few milliseconds). 172.34.0.4 is operations-dns, 192.168.2.1 the pfSense resolver, 1.1.1.1 the upstream reference."
+
+  - alert: dns_probe_failed
+    expr: probe_success{job=~"dns_internal|dns_public"} == 0
+    for: 3m
+    labels:
+      severity: page
+    annotations:
+      summary: "DNS via {{ $labels.instance }} ({{ $labels.job }}) fails"
+      description: "The DNS query through {{ $labels.instance }} has failed or timed out (5 s) for 3 minutes."
+
